@@ -64,37 +64,42 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full max-w-sm animate-in fade-in slide-in-from-bottom-6 duration-700">
-      <Card className="bg-zinc-900 border border-zinc-800 shadow-[0_0_80px_-20px_rgba(251,191,36,0.12)] ring-0">
+    <div className="w-full max-w-sm motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-500">
+      <Card className="bg-card border border-border ring-0">
         <CardHeader className="pb-2 pt-8 px-8">
           {/* Logo mark */}
           <div className="flex flex-col items-center gap-4 mb-2">
             <div className="relative">
-              <div className="w-14 h-14 rounded-2xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center">
+              <div className="flex items-center gap-1.5">
                 <span
-                  className="text-amber-400 text-2xl font-bold leading-none select-none"
+                  className="text-3xl font-bold text-amber-400 leading-none"
                   style={{ fontFamily: "var(--font-syne)" }}
                 >
                   Q
                 </span>
+                <span
+                  className="text-xl font-semibold text-foreground leading-none"
+                  style={{ fontFamily: "var(--font-syne)" }}
+                >
+                  uesalon
+                </span>
               </div>
-              <div className="absolute -inset-0.5 rounded-2xl bg-amber-400/5 blur-sm -z-10" />
             </div>
             <div className="text-center">
               <h1
-                className="text-zinc-100 text-xl font-semibold tracking-tight"
+                className="text-foreground text-xl font-semibold tracking-tight"
                 style={{ fontFamily: "var(--font-syne)" }}
               >
                 Quesalon RPA
               </h1>
-              <p className="text-zinc-500 text-xs mt-0.5 tracking-wide uppercase">
+              <p className="text-muted-foreground text-xs mt-0.5 tracking-wide uppercase">
                 Sistema de Verificação Fiscal
               </p>
             </div>
           </div>
 
           {/* Divider */}
-          <div className="h-px bg-zinc-800 mt-4" />
+          <div className="h-px bg-border mt-4" />
         </CardHeader>
 
         <CardContent className="px-8 pb-8">
@@ -102,7 +107,7 @@ export default function LoginPage() {
             <div className="flex flex-col gap-1.5">
               <Label
                 htmlFor="email"
-                className="text-zinc-400 text-xs uppercase tracking-wider"
+                className="text-muted-foreground text-xs uppercase tracking-wider"
               >
                 E-mail
               </Label>
@@ -115,14 +120,14 @@ export default function LoginPage() {
                 required
                 autoComplete="email"
                 disabled={loading}
-                className="bg-zinc-800/60 border-zinc-700/50 text-zinc-100 placeholder:text-zinc-600 focus-visible:border-amber-400/50 focus-visible:ring-amber-400/20 h-10"
+                className="bg-muted/60 border-border text-foreground placeholder:text-muted-foreground focus-visible:border-amber-400/50 focus-visible:ring-amber-400/20 h-10"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
               <Label
                 htmlFor="password"
-                className="text-zinc-400 text-xs uppercase tracking-wider"
+                className="text-muted-foreground text-xs uppercase tracking-wider"
               >
                 Senha
               </Label>
@@ -135,7 +140,7 @@ export default function LoginPage() {
                 required
                 autoComplete="current-password"
                 disabled={loading}
-                className="bg-zinc-800/60 border-zinc-700/50 text-zinc-100 placeholder:text-zinc-600 focus-visible:border-amber-400/50 focus-visible:ring-amber-400/20 h-10"
+                className="bg-muted/60 border-border text-foreground placeholder:text-muted-foreground focus-visible:border-amber-400/50 focus-visible:ring-amber-400/20 h-10"
               />
             </div>
 

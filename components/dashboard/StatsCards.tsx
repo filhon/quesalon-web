@@ -1,7 +1,5 @@
 "use client";
 
-import { FileText, RotateCcw, AlertTriangle } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface Props {
@@ -11,95 +9,60 @@ interface Props {
   loading?: boolean;
 }
 
-interface StatCardProps {
+interface StatItemProps {
   label: string;
   value: number;
-  icon: React.ReactNode;
   accent: string;
-  bgAccent: string;
-  borderAccent: string;
 }
 
-function StatCard({
-  label,
-  value,
-  icon,
-  accent,
-  bgAccent,
-  borderAccent,
-}: StatCardProps) {
+function StatItem({ label, value, accent }: StatItemProps) {
   return (
-    <Card className={`bg-zinc-900/60 border ${borderAccent} flex-1 min-w-0`}>
-      <CardContent className="p-4 flex flex-col gap-3">
-        <div
-          className={`w-8 h-8 rounded-lg ${bgAccent} border ${borderAccent} flex items-center justify-center`}
-        >
-          <span className={`${accent} [&_svg]:size-4`}>{icon}</span>
-        </div>
-        <div>
-          <p className="text-zinc-400 text-xs uppercase tracking-wider leading-none mb-1.5">
-            {label}
-          </p>
-          <p className={`text-2xl font-semibold tabular-nums ${accent}`}>
-            {value.toLocaleString("pt-BR")}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function SkeletonCard() {
-  return (
-    <Card className="bg-zinc-900/60 border-zinc-700/50 min-w-0">
-      <CardContent className="p-4 flex flex-col gap-3">
-        <Skeleton className="w-8 h-8 rounded-lg" />
-        <div className="flex flex-col gap-1.5">
-          <Skeleton className="w-20 h-3" />
-          <Skeleton className="w-12 h-7" />
-        </div>
-      </CardContent>
-    </Card>
+    <div className="px-5 py-4">
+      <p className="text-xs text-muted-foreground font-medium mb-1.5">
+        {label}
+      </p>
+      <p className={`text-2xl font-bold tabular-nums tracking-tight ${accent}`}>
+        {value.toLocaleString("pt-BR")}
+      </p>
+    </div>
   );
 }
 
 export function StatsCards({ total, dev, desc, loading }: Props) {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <SkeletonCard />
-        <SkeletonCard />
-        <SkeletonCard />
+      <div className="border border-border rounded-lg bg-background/60">
+        <div className="grid grid-cols-3 divide-x divide-border">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="px-5 py-4 flex flex-col gap-2">
+              <Skeleton className="w-24 h-3" />
+              <Skeleton className="w-16 h-7" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      <StatCard
-        label="Total verificadas"
-        value={total}
-        icon={<FileText />}
-        accent="text-zinc-300"
-        bgAccent="bg-zinc-800/60"
-        borderAccent="border-zinc-700/50"
-      />
-      <StatCard
-        label="Devoluções"
-        value={dev}
-        icon={<RotateCcw />}
-        accent="text-blue-400"
-        bgAccent="bg-blue-500/10"
-        borderAccent="border-blue-500/20"
-      />
-      <StatCard
-        label="Desacordos"
-        value={desc}
-        icon={<AlertTriangle />}
-        accent="text-amber-400"
-        bgAccent="bg-amber-400/10"
-        borderAccent="border-amber-400/20"
-      />
+    <div className="border border-border rounded-lg bg-background/60">
+      <div className="grid grid-cols-3 divide-x divide-border">
+        <StatItem
+          label="Total verificadas"
+          value={total}
+          accent="text-foreground"
+        />
+        <StatItem
+          label="Devoluções"
+          value={dev}
+          accent="text-blue-500 dark:text-blue-400"
+        />
+        <StatItem
+          label="Desacordos"
+          value={desc}
+          accent="text-amber-500 dark:text-amber-400"
+        />
+      </div>
     </div>
   );
 }

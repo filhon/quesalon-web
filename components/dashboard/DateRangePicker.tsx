@@ -53,7 +53,7 @@ export function DateRangePicker({ value, onChange, disabled }: Props) {
       <div className="flex flex-col gap-1.5">
         <Label
           htmlFor="date-from"
-          className="text-zinc-400 text-xs uppercase tracking-wider"
+          className="text-muted-foreground text-xs uppercase tracking-wider"
         >
           De
         </Label>
@@ -63,14 +63,14 @@ export function DateRangePicker({ value, onChange, disabled }: Props) {
               id="date-from"
               variant="outline"
               disabled={disabled}
-              className="w-full h-9 justify-start gap-2 bg-zinc-800/60 border-zinc-700/50 text-zinc-100 hover:bg-zinc-700/50 hover:text-zinc-100 font-normal text-sm"
+              className="w-full h-9 justify-start gap-2 bg-muted/60 border-border text-foreground hover:bg-muted/80 hover:text-foreground font-normal text-sm"
             >
-              <CalendarIcon className="size-3.5 text-zinc-500 shrink-0" />
+              <CalendarIcon className="size-3.5 text-muted-foreground shrink-0" />
               <span>{formatDate(value.from)}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent
-            className="w-auto p-0 bg-zinc-900 border-zinc-700"
+            className="w-auto p-0 bg-popover border-border"
             align="start"
           >
             <Calendar
@@ -79,11 +79,6 @@ export function DateRangePicker({ value, onChange, disabled }: Props) {
               onSelect={handleFromSelect}
               defaultMonth={value.from}
               locale={ptBR}
-              classNames={{
-                root: "bg-zinc-900",
-                months: "bg-zinc-900",
-                month: "bg-zinc-900",
-              }}
             />
           </PopoverContent>
         </Popover>
@@ -93,7 +88,7 @@ export function DateRangePicker({ value, onChange, disabled }: Props) {
       <div className="flex flex-col gap-1.5">
         <Label
           htmlFor="date-to"
-          className="text-zinc-400 text-xs uppercase tracking-wider"
+          className="text-muted-foreground text-xs uppercase tracking-wider"
         >
           Até
         </Label>
@@ -103,14 +98,14 @@ export function DateRangePicker({ value, onChange, disabled }: Props) {
               id="date-to"
               variant="outline"
               disabled={disabled}
-              className="w-full h-9 justify-start gap-2 bg-zinc-800/60 border-zinc-700/50 text-zinc-100 hover:bg-zinc-700/50 hover:text-zinc-100 font-normal text-sm"
+              className="w-full h-9 justify-start gap-2 bg-muted/60 border-border text-foreground hover:bg-muted/80 hover:text-foreground font-normal text-sm"
             >
-              <CalendarIcon className="size-3.5 text-zinc-500 shrink-0" />
+              <CalendarIcon className="size-3.5 text-muted-foreground shrink-0" />
               <span>{formatDate(value.to)}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent
-            className="w-auto p-0 bg-zinc-900 border-zinc-700"
+            className="w-auto p-0 bg-popover border-border"
             align="start"
           >
             <Calendar
@@ -119,11 +114,6 @@ export function DateRangePicker({ value, onChange, disabled }: Props) {
               onSelect={handleToSelect}
               defaultMonth={value.to}
               locale={ptBR}
-              classNames={{
-                root: "bg-zinc-900",
-                months: "bg-zinc-900",
-                month: "bg-zinc-900",
-              }}
             />
           </PopoverContent>
         </Popover>

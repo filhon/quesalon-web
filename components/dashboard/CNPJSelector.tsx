@@ -31,7 +31,7 @@ export function CNPJSelector({ value, onSelect, disabled }: Props) {
     <div className="flex flex-col gap-1.5">
       <Label
         htmlFor="cnpj-select"
-        className="text-zinc-400 text-xs uppercase tracking-wider"
+        className="text-muted-foreground text-xs uppercase tracking-wider"
       >
         Empresa / CNPJ
       </Label>
@@ -42,19 +42,19 @@ export function CNPJSelector({ value, onSelect, disabled }: Props) {
       >
         <SelectTrigger
           id="cnpj-select"
-          className="w-full h-9 bg-zinc-800/60 border-zinc-700/50 text-zinc-100 focus:border-amber-400/50 focus:ring-amber-400/20"
+          className="w-full h-9 bg-muted/60 border-border text-foreground focus:border-amber-400/50 focus:ring-amber-400/20"
         >
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="bg-zinc-900 border-zinc-700">
+        <SelectContent className="bg-popover border-border">
           {COMPANIES.map((c) => (
             <SelectItem
               key={c.cnpj}
               value={c.cnpj}
-              className="text-zinc-300 focus:bg-zinc-800 focus:text-zinc-100"
+              className="text-foreground focus:bg-muted focus:text-foreground"
             >
               <span className="font-medium">{c.label}</span>
-              <span className="ml-2 font-mono text-xs text-zinc-500">
+              <span className="ml-2 font-mono text-xs text-muted-foreground">
                 {formatCnpj(c.cnpj)}
               </span>
             </SelectItem>

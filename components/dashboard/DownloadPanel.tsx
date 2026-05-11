@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { fetchAndDownload } from "@/lib/download-utils";
 import type { NFeDoc, VerificationResult } from "@/lib/types";
@@ -107,9 +108,9 @@ export function DownloadPanel({ result, loading }: Props) {
   const allKeys = result ? [...result.dev, ...result.notDev] : [];
 
   return (
-    <Card className="bg-zinc-900/60 border-zinc-800">
+    <Card className="bg-card border-border">
       <CardHeader className="px-5 pt-5 pb-0">
-        <p className="text-zinc-400 text-xs uppercase tracking-wider font-medium">
+        <p className="text-muted-foreground text-xs uppercase tracking-wider font-medium">
           Downloads
         </p>
       </CardHeader>
@@ -117,7 +118,9 @@ export function DownloadPanel({ result, loading }: Props) {
       <CardContent className="p-5 flex flex-col gap-5">
         {/* Batch downloads */}
         <div className="flex flex-col gap-2">
-          <p className="text-zinc-500 text-xs font-medium">Downloads em Lote</p>
+          <p className="text-muted-foreground text-xs font-medium">
+            Downloads em Lote
+          </p>
 
           <Button
             variant="outline"
@@ -128,13 +131,13 @@ export function DownloadPanel({ result, loading }: Props) {
                 handleBatchZip(allKeys, "xml", "Todos (XML)"),
               )
             }
-            className="justify-start gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
+            className="justify-start gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
             aria-label="Baixar todos os XMLs em ZIP"
           >
-            <Archive className="size-4 text-blue-400" />
+            <Archive className="size-4 text-blue-500 dark:text-blue-400" />
             Todos (XML)
             {busy === "all-xml" && (
-              <Loader2 className="ml-auto size-3.5 animate-spin text-zinc-500" />
+              <Loader2 className="ml-auto size-3.5 animate-spin text-muted-foreground" />
             )}
           </Button>
 
@@ -147,13 +150,13 @@ export function DownloadPanel({ result, loading }: Props) {
                 handleBatchZip(result!.dev, "xml", "Devoluções (XML)"),
               )
             }
-            className="justify-start gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
+            className="justify-start gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
             aria-label="Baixar XMLs de devoluções em ZIP"
           >
-            <Archive className="size-4 text-amber-400" />
+            <Archive className="size-4 text-amber-500 dark:text-amber-400" />
             Devoluções (XML)
             {busy === "dev-xml" && (
-              <Loader2 className="ml-auto size-3.5 animate-spin text-zinc-500" />
+              <Loader2 className="ml-auto size-3.5 animate-spin text-muted-foreground" />
             )}
           </Button>
 
@@ -166,13 +169,13 @@ export function DownloadPanel({ result, loading }: Props) {
                 handleBatchZip(result!.cnpjDesc, "xml", "Desacordos (XML)"),
               )
             }
-            className="justify-start gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
+            className="justify-start gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
             aria-label="Baixar XMLs de desacordos em ZIP"
           >
-            <Archive className="size-4 text-red-400" />
+            <Archive className="size-4 text-red-500 dark:text-red-400" />
             Desacordos (XML)
             {busy === "desc-xml" && (
-              <Loader2 className="ml-auto size-3.5 animate-spin text-zinc-500" />
+              <Loader2 className="ml-auto size-3.5 animate-spin text-muted-foreground" />
             )}
           </Button>
 
@@ -185,86 +188,90 @@ export function DownloadPanel({ result, loading }: Props) {
                 handleBatchZip(result!.dev, "danfe", "Devoluções (DANFE)"),
               )
             }
-            className="justify-start gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
+            className="justify-start gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
             aria-label="Baixar DANFEs de devoluções em ZIP"
           >
-            <Download className="size-4 text-emerald-400" />
+            <Download className="size-4 text-emerald-500 dark:text-emerald-400" />
             Devoluções (PDF/DANFE)
             {busy === "dev-danfe" && (
-              <Loader2 className="ml-auto size-3.5 animate-spin text-zinc-500" />
+              <Loader2 className="ml-auto size-3.5 animate-spin text-muted-foreground" />
             )}
           </Button>
         </div>
 
-        <Separator className="bg-zinc-800" />
+        <Separator />
 
         {/* Per access key */}
         <div className="flex flex-col gap-2">
-          <p className="text-zinc-500 text-xs font-medium">
+          <p className="text-muted-foreground text-xs font-medium">
             Por Chave de Acesso
           </p>
 
+          <Label htmlFor="access-key" className="text-xs text-muted-foreground">
+            Chave de Acesso
+          </Label>
           <Input
+            id="access-key"
             value={accessKey}
             onChange={(e) =>
               setAccessKey(e.target.value.replace(/\D/g, "").slice(0, 44))
             }
             placeholder="Digite a chave de acesso (44 dígitos)"
             maxLength={44}
-            className="h-9 bg-zinc-800/60 border-zinc-700/50 text-zinc-100 placeholder:text-zinc-600 text-xs font-mono"
+            className="h-9 bg-muted/60 border-border text-foreground placeholder:text-muted-foreground text-xs font-mono"
           />
 
           <div className="flex gap-2">
             <Button
               variant="outline"
-              size="sm"
+              size="default"
               disabled={busy !== null}
               onClick={() => run("key-xml", handleSingleXml)}
-              className="flex-1 justify-center gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
+              className="flex-1 justify-center gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
               aria-label="Baixar XML por chave de acesso"
             >
-              <FileCode className="size-4 text-blue-400" />
+              <FileCode className="size-4 text-blue-500 dark:text-blue-400" />
               XML
             </Button>
 
             <Button
               variant="outline"
-              size="sm"
+              size="default"
               disabled={busy !== null}
               onClick={() => run("key-danfe", handleSingleDanfe)}
-              className="flex-1 justify-center gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
+              className="flex-1 justify-center gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
               aria-label="Baixar DANFE por chave de acesso"
             >
-              <FileText className="size-4 text-amber-400" />
+              <FileText className="size-4 text-amber-500 dark:text-amber-400" />
               DANFE
             </Button>
           </div>
         </div>
 
-        <Separator className="bg-zinc-800" />
+        <Separator />
 
         {/* Report */}
         <div className="flex flex-col gap-2">
-          <p className="text-zinc-500 text-xs font-medium">Relatório</p>
+          <p className="text-muted-foreground text-xs font-medium">Relatório</p>
 
           <Button
             variant="outline"
             size="sm"
             disabled={disabled || busy !== null}
             onClick={() => run("excel", handleExcel)}
-            className="justify-start gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
+            className="justify-start gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
             aria-label="Gerar relatório Excel"
           >
-            <Sheet className="size-4 text-emerald-400" />
+            <Sheet className="size-4 text-emerald-500 dark:text-emerald-400" />
             Gerar Excel (.xlsx)
             {busy === "excel" && (
-              <Loader2 className="ml-auto size-3.5 animate-spin text-zinc-500" />
+              <Loader2 className="ml-auto size-3.5 animate-spin text-muted-foreground" />
             )}
           </Button>
         </div>
 
         {disabled && !loading && (
-          <p className="text-zinc-600 text-xs">
+          <p className="text-muted-foreground text-xs">
             Execute uma verificação para habilitar os downloads em lote.
           </p>
         )}

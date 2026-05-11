@@ -5,7 +5,6 @@ import { format } from "date-fns";
 import { Loader2, Search } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { CNPJSelector } from "@/components/dashboard/CNPJSelector";
 import {
   DateRangePicker,
@@ -88,32 +87,32 @@ export default function DashboardPage() {
     <div className="max-w-7xl mx-auto">
       <div className="mb-6">
         <h2
-          className="text-lg font-semibold text-zinc-100 tracking-tight"
+          className="text-lg font-semibold text-foreground tracking-tight"
           style={{ fontFamily: "var(--font-syne)" }}
         >
           Verificação Fiscal
         </h2>
-        <p className="text-zinc-500 text-sm mt-0.5">
+        <p className="text-muted-foreground text-sm mt-0.5">
           Consulte e valide NF-es por empresa e período
         </p>
       </div>
 
       <div className="grid md:grid-cols-[320px_1fr] gap-6 items-start">
         {/* Left column */}
-        <div className="flex flex-col gap-5 rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
-          <CNPJSelector
-            value={company}
-            onSelect={setCompany}
-            disabled={loading}
-          />
+        <div className="flex flex-col gap-5 rounded-xl border border-border bg-card/40 p-5">
+          <div className="flex flex-col gap-3">
+            <CNPJSelector
+              value={company}
+              onSelect={setCompany}
+              disabled={loading}
+            />
 
-          <Separator className="bg-zinc-800" />
-
-          <DateRangePicker
-            value={dateRange}
-            onChange={setDateRange}
-            disabled={loading}
-          />
+            <DateRangePicker
+              value={dateRange}
+              onChange={setDateRange}
+              disabled={loading}
+            />
+          </div>
 
           <Button
             onClick={handleVerify}
@@ -135,8 +134,6 @@ export default function DashboardPage() {
               </>
             )}
           </Button>
-
-          <Separator className="bg-zinc-800" />
 
           <EventLog log={log} onClear={() => setLog([])} />
         </div>
