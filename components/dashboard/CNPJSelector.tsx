@@ -18,9 +18,10 @@ function formatCnpj(raw: string): string {
 interface Props {
   value: Company;
   onSelect: (company: Company) => void;
+  disabled?: boolean;
 }
 
-export function CNPJSelector({ value, onSelect }: Props) {
+export function CNPJSelector({ value, onSelect, disabled }: Props) {
   function handleChange(cnpj: string) {
     const found = COMPANIES.find((c) => c.cnpj === cnpj);
     if (found) onSelect(found);
@@ -28,11 +29,21 @@ export function CNPJSelector({ value, onSelect }: Props) {
 
   return (
     <div className="flex flex-col gap-1.5">
-      <Label className="text-zinc-400 text-xs uppercase tracking-wider">
+      <Label
+        htmlFor="cnpj-select"
+        className="text-zinc-400 text-xs uppercase tracking-wider"
+      >
         Empresa / CNPJ
       </Label>
-      <Select value={value.cnpj} onValueChange={handleChange}>
-        <SelectTrigger className="w-full h-9 bg-zinc-800/60 border-zinc-700/50 text-zinc-100 focus:border-amber-400/50 focus:ring-amber-400/20">
+      <Select
+        value={value.cnpj}
+        onValueChange={handleChange}
+        disabled={disabled}
+      >
+        <SelectTrigger
+          id="cnpj-select"
+          className="w-full h-9 bg-zinc-800/60 border-zinc-700/50 text-zinc-100 focus:border-amber-400/50 focus:ring-amber-400/20"
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent className="bg-zinc-900 border-zinc-700">

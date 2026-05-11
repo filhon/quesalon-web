@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { FileCode, FileText, Sheet, Archive, Download } from "lucide-react";
+import {
+  FileCode,
+  FileText,
+  Sheet,
+  Archive,
+  Download,
+  Loader2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -122,11 +129,12 @@ export function DownloadPanel({ result, loading }: Props) {
               )
             }
             className="justify-start gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
+            aria-label="Baixar todos os XMLs em ZIP"
           >
             <Archive className="size-4 text-blue-400" />
             Todos (XML)
             {busy === "all-xml" && (
-              <span className="ml-auto text-zinc-500 text-xs">…</span>
+              <Loader2 className="ml-auto size-3.5 animate-spin text-zinc-500" />
             )}
           </Button>
 
@@ -140,11 +148,12 @@ export function DownloadPanel({ result, loading }: Props) {
               )
             }
             className="justify-start gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
+            aria-label="Baixar XMLs de devoluções em ZIP"
           >
             <Archive className="size-4 text-amber-400" />
             Devoluções (XML)
             {busy === "dev-xml" && (
-              <span className="ml-auto text-zinc-500 text-xs">…</span>
+              <Loader2 className="ml-auto size-3.5 animate-spin text-zinc-500" />
             )}
           </Button>
 
@@ -158,11 +167,12 @@ export function DownloadPanel({ result, loading }: Props) {
               )
             }
             className="justify-start gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
+            aria-label="Baixar XMLs de desacordos em ZIP"
           >
             <Archive className="size-4 text-red-400" />
             Desacordos (XML)
             {busy === "desc-xml" && (
-              <span className="ml-auto text-zinc-500 text-xs">…</span>
+              <Loader2 className="ml-auto size-3.5 animate-spin text-zinc-500" />
             )}
           </Button>
 
@@ -176,11 +186,12 @@ export function DownloadPanel({ result, loading }: Props) {
               )
             }
             className="justify-start gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
+            aria-label="Baixar DANFEs de devoluções em ZIP"
           >
             <Download className="size-4 text-emerald-400" />
             Devoluções (PDF/DANFE)
             {busy === "dev-danfe" && (
-              <span className="ml-auto text-zinc-500 text-xs">…</span>
+              <Loader2 className="ml-auto size-3.5 animate-spin text-zinc-500" />
             )}
           </Button>
         </div>
@@ -247,7 +258,7 @@ export function DownloadPanel({ result, loading }: Props) {
             <Sheet className="size-4 text-emerald-400" />
             Gerar Excel (.xlsx)
             {busy === "excel" && (
-              <span className="ml-auto text-zinc-500 text-xs">…</span>
+              <Loader2 className="ml-auto size-3.5 animate-spin text-zinc-500" />
             )}
           </Button>
         </div>

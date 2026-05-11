@@ -1,8 +1,12 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Syne } from "next/font/google";
-import { LogOut, Layers } from "lucide-react";
+import { LogOut, Layers, Mail, Clock } from "lucide-react";
+import { onAuthStateChanged } from "firebase/auth";
+import { ref, onValue } from "firebase/database";
 import { signOut } from "@/lib/auth-actions";
+import { auth, db } from "@/lib/firebase";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +27,23 @@ function formatCnpj(raw: string): string {
 
 function AppHeader() {
   const { company } = useCompany();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [lastAccess, setLastAccess] = useState<string | null>(null);
+
+  useEffect(() => {
+    const unsubAuth = onAuthStateChanged(auth, (user) => {
+      setUserEmail(user?.email ?? null);
+    });
+    const loginRef = ref(db, "log-login");
+    const unsubDb = onValue(loginRef, (snap) => {
+      const val = snap.val();
+      if (val?.data) setLastAccess(val.data as string);
+    });
+    return () => {
+      unsubAuth();
+      unsubDb();
+    };
+  }, []);
 
   return (
     <header
@@ -49,16 +70,31 @@ function AppHeader() {
           <span className="text-amber-400/70">{formatCnpj(company.cnpj)}</span>
         </Badge>
 
-        {/* Logout */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={signOut}
-          className="gap-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 h-8 px-3"
-        >
-          <LogOut className="size-3.5" />
-          <span className="hidden sm:inline text-xs">Sair</span>
-        </Button>
+        {/* User info + Logout */}
+        <div className="flex items-center gap-3">
+          {lastAccess && (
+            <span className="hidden lg:flex items-center gap-1.5 text-xs text-zinc-600">
+              <Clock className="size-3 shrink-0" />
+              Último: {lastAccess}
+            </span>
+          )}
+          {userEmail && (
+            <span className="hidden md:flex items-center gap-1.5 text-xs text-zinc-500">
+              <Mail className="size-3 shrink-0" />
+              {userEmail}
+            </span>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={signOut}
+            aria-label="Sair da conta"
+            className="gap-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 h-8 px-3"
+          >
+            <LogOut className="size-3.5" />
+            <span className="hidden sm:inline text-xs">Sair</span>
+          </Button>
+        </div>
       </div>
     </header>
   );

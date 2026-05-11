@@ -101,15 +101,26 @@ export default function DashboardPage() {
       <div className="grid md:grid-cols-[320px_1fr] gap-6 items-start">
         {/* Left column */}
         <div className="flex flex-col gap-5 rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
-          <CNPJSelector value={company} onSelect={setCompany} />
+          <CNPJSelector
+            value={company}
+            onSelect={setCompany}
+            disabled={loading}
+          />
 
           <Separator className="bg-zinc-800" />
 
-          <DateRangePicker value={dateRange} onChange={setDateRange} />
+          <DateRangePicker
+            value={dateRange}
+            onChange={setDateRange}
+            disabled={loading}
+          />
 
           <Button
             onClick={handleVerify}
             disabled={loading}
+            aria-label={
+              loading ? "Verificando notas..." : "Verificar notas fiscais"
+            }
             className="w-full h-9 bg-amber-400 hover:bg-amber-300 text-zinc-950 font-semibold transition-colors duration-200 disabled:opacity-60 gap-2"
           >
             {loading ? (
@@ -136,6 +147,7 @@ export default function DashboardPage() {
             total={result ? result.dev.length + result.notDev.length : 0}
             dev={result ? result.dev.length : 0}
             desc={result ? result.cnpjDesc.length : 0}
+            loading={loading}
           />
 
           <DownloadPanel result={result} loading={loading} />

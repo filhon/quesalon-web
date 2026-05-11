@@ -22,13 +22,14 @@ interface DateRangeValue {
 interface Props {
   value: DateRangeValue;
   onChange: (range: DateRangeValue) => void;
+  disabled?: boolean;
 }
 
 function formatDate(d: Date): string {
   return format(d, "dd 'de' MMM yyyy", { locale: ptBR });
 }
 
-export function DateRangePicker({ value, onChange }: Props) {
+export function DateRangePicker({ value, onChange, disabled }: Props) {
   const [fromOpen, setFromOpen] = useState(false);
   const [toOpen, setToOpen] = useState(false);
 
@@ -50,13 +51,18 @@ export function DateRangePicker({ value, onChange }: Props) {
     <div className="flex flex-col gap-3">
       {/* De */}
       <div className="flex flex-col gap-1.5">
-        <Label className="text-zinc-400 text-xs uppercase tracking-wider">
+        <Label
+          htmlFor="date-from"
+          className="text-zinc-400 text-xs uppercase tracking-wider"
+        >
           De
         </Label>
         <Popover open={fromOpen} onOpenChange={setFromOpen}>
           <PopoverTrigger asChild>
             <Button
+              id="date-from"
               variant="outline"
+              disabled={disabled}
               className="w-full h-9 justify-start gap-2 bg-zinc-800/60 border-zinc-700/50 text-zinc-100 hover:bg-zinc-700/50 hover:text-zinc-100 font-normal text-sm"
             >
               <CalendarIcon className="size-3.5 text-zinc-500 shrink-0" />
@@ -85,13 +91,18 @@ export function DateRangePicker({ value, onChange }: Props) {
 
       {/* Até */}
       <div className="flex flex-col gap-1.5">
-        <Label className="text-zinc-400 text-xs uppercase tracking-wider">
+        <Label
+          htmlFor="date-to"
+          className="text-zinc-400 text-xs uppercase tracking-wider"
+        >
           Até
         </Label>
         <Popover open={toOpen} onOpenChange={setToOpen}>
           <PopoverTrigger asChild>
             <Button
+              id="date-to"
               variant="outline"
+              disabled={disabled}
               className="w-full h-9 justify-start gap-2 bg-zinc-800/60 border-zinc-700/50 text-zinc-100 hover:bg-zinc-700/50 hover:text-zinc-100 font-normal text-sm"
             >
               <CalendarIcon className="size-3.5 text-zinc-500 shrink-0" />

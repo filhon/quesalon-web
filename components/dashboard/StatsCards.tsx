@@ -2,11 +2,13 @@
 
 import { FileText, RotateCcw, AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Props {
   total: number;
   dev: number;
   desc: number;
+  loading?: boolean;
 }
 
 interface StatCardProps {
@@ -47,9 +49,33 @@ function StatCard({
   );
 }
 
-export function StatsCards({ total, dev, desc }: Props) {
+function SkeletonCard() {
   return (
-    <div className="flex gap-3">
+    <Card className="bg-zinc-900/60 border-zinc-700/50 min-w-0">
+      <CardContent className="p-4 flex flex-col gap-3">
+        <Skeleton className="w-8 h-8 rounded-lg" />
+        <div className="flex flex-col gap-1.5">
+          <Skeleton className="w-20 h-3" />
+          <Skeleton className="w-12 h-7" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+export function StatsCards({ total, dev, desc, loading }: Props) {
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <SkeletonCard />
+        <SkeletonCard />
+        <SkeletonCard />
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
       <StatCard
         label="Total verificadas"
         value={total}
