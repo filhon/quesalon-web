@@ -21,13 +21,14 @@ import type { NFeDoc, VerificationResult } from "@/lib/types";
 interface Props {
   result: VerificationResult | null;
   loading: boolean;
+  onReportDownloaded?: (devDocs: NFeDoc[]) => void;
 }
 
 function getKey(doc: NFeDoc): string {
   return String(doc.nfeProc.protNFe.infProt.chNFe);
 }
 
-export function DownloadPanel({ result, loading }: Props) {
+export function DownloadPanel({ result, loading, onReportDownloaded }: Props) {
   const [accessKey, setAccessKey] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -103,6 +104,7 @@ export function DownloadPanel({ result, loading }: Props) {
       { docs: result.dev },
       "relatorio_quesalon.xlsx",
     );
+    onReportDownloaded?.(result.dev);
   }
 
   const allKeys = result ? [...result.dev, ...result.notDev] : [];

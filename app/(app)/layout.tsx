@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Syne } from "next/font/google";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { LogOut, Mail, Clock, Sun, Moon } from "lucide-react";
 import { QuesalonLogo } from "@/components/quesalon-logo";
 import { onAuthStateChanged } from "firebase/auth";
@@ -32,6 +34,7 @@ function AppHeader() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [lastAccess, setLastAccess] = useState<string | null>(null);
   const { resolvedTheme, setTheme } = useTheme();
+  const pathname = usePathname();
 
   useEffect(() => {
     let unsubDb: (() => void) | undefined;
@@ -60,15 +63,43 @@ function AppHeader() {
   return (
     <header className="fixed top-0 inset-x-0 z-30 h-14 border-b border-border bg-background/90 backdrop-blur-sm">
       <div className="flex h-full items-center justify-between px-6">
-        {/* Logo */}
-        <div className="flex items-center gap-2.5">
-          <QuesalonLogo className="size-7 text-amber-400" />
-          <span
-            className="text-sm font-semibold tracking-tight text-foreground"
-            style={{ fontFamily: "var(--font-syne)" }}
+        {/* Logo + Nav */}
+        <div className="flex items-center gap-5">
+          <div className="flex items-center gap-2.5">
+            <QuesalonLogo className="size-7 text-amber-400" />
+            <span
+              className="text-sm font-semibold tracking-tight text-foreground"
+              style={{ fontFamily: "var(--font-syne)" }}
+            >
+              Quesalon <span className="text-amber-400">RPA</span>
+            </span>
+          </div>
+
+          <nav
+            className="flex items-center gap-0.5"
+            aria-label="Navegação principal"
           >
-            Quesalon <span className="text-amber-400">RPA</span>
-          </span>
+            {[
+              { href: "/dashboard", label: "Dashboard" },
+              { href: "/historico", label: "Histórico" },
+            ].map(({ href, label }) => {
+              const active = pathname.startsWith(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={[
+                    "px-2.5 py-1 rounded-md text-xs font-medium transition-colors duration-150",
+                    active
+                      ? "text-foreground bg-muted/60"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/40",
+                  ].join(" ")}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </nav>
         </div>
 
         {/* Center: selected company badge */}

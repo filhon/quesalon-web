@@ -15,6 +15,8 @@ import { EventLog } from "@/components/dashboard/EventLog";
 import { DownloadPanel } from "@/components/dashboard/DownloadPanel";
 import { useCompany } from "@/components/dashboard/company-context";
 import { verifyNFe } from "@/lib/verify";
+import { saveVerificationHistory, saveReportHistory } from "@/lib/history";
+import { auth } from "@/lib/firebase";
 import type { NFeDoc, VerificationResult } from "@/lib/types";
 
 export default function DashboardPage() {
@@ -74,6 +76,25 @@ export default function DashboardPage() {
 
       setResult(verificationResult);
       toast.success(`${total} nota(s) verificada(s)`);
+
+      try {
+        const userEmail = auth.currentUser?.email ?? "";
+        await saveVerificationHistory({
+          timestamp: Date.now(),
+          userEmail,
+          company: { label: company.label, cnpj: company.cnpj },
+          dateRange: { from: startDate, to: endDate },
+          counts: {
+            total,
+            dev: verificationResult.dev.length,
+            notDev: verificationResult.notDev.length,
+            cnpjAcor: verificationResult.cnpjAcor.length,
+            cnpjDesc: verificationResult.cnpjDesc.length,
+          },
+        });
+      } catch {
+        // History save is non-blocking
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erro desconhecido";
       setLog((prev) => [...prev, `✗ ${message}`]);
@@ -144,7 +165,31 @@ export default function DashboardPage() {
             loading={loading}
           />
 
-          <DownloadPanel result={result} loading={loading} />
+          <DownloadPanel
+            result={result}
+            loading={loading}
+            onReportDownloaded={async (devDocs) => {
+              if (!dateRange?.from || !dateRange?.to) return;
+              try {
+                const userEmail = auth.currentUser?.email ?? "";
+                await saveReportHistory(
+                  {
+                    timestamp: Date.now(),
+                    userEmail,
+                    company: { label: company.label, cnpj: company.cnpj },
+                    dateRange: {
+                      from: format(dateRange.from, "yyyy-MM-dd"),
+                      to: format(dateRange.to, "yyyy-MM-dd"),
+                    },
+                    devCount: devDocs.length,
+                  },
+                  devDocs,
+                );
+              } catch {
+                // History save is non-blocking
+              }
+            }}
+          />
         </div>
       </div>
     </div>

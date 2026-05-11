@@ -49,3 +49,27 @@ export interface Company {
 }
 
 export type XmlType = 1 | 2 | 3 | 4 | 5;
+
+export interface VerificationHistoryEntry {
+  id?: string;
+  timestamp: number;
+  userEmail: string;
+  company: { label: string; cnpj: string };
+  dateRange: { from: string; to: string };
+  counts: {
+    total: number;
+    dev: number;
+    notDev: number;
+    cnpjAcor: number;
+    cnpjDesc: number;
+  };
+}
+
+export interface ReportHistoryEntry {
+  id?: string;
+  timestamp: number;
+  userEmail: string;
+  company: { label: string; cnpj: string };
+  dateRange: { from: string; to: string };
+  devCount: number;
+}
