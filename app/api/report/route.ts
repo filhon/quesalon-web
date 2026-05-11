@@ -1,5 +1,12 @@
 import ExcelJS from "exceljs";
 import type { NFeDoc } from "@/lib/types";
+import {
+  requireAuth,
+  unauthorizedResponse,
+  AuthError,
+} from "@/lib/auth-server";
+
+const MAX_DOCS = 10_000;
 
 const COLUMNS = [
   "cd_und",
@@ -28,14 +35,29 @@ const COLUMNS = [
 
 export async function POST(request: Request) {
   try {
-    const { docs } = (await request.json()) as { docs: NFeDoc[] };
+    await requireAuth(request);
+  } catch (err) {
+    if (err instanceof AuthError) return unauthorizedResponse();
+    return Response.json({ error: "Auth error" }, { status: 500 });
+  }
+
+  try {
+    const body = await request.json();
+    const { docs } = body as { docs: unknown };
+
+    if (!Array.isArray(docs) || docs.length > MAX_DOCS) {
+      return Response.json(
+        { error: `docs must be an array of at most ${MAX_DOCS} items` },
+        { status: 400 },
+      );
+    }
 
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet("Relatório");
 
     sheet.columns = COLUMNS.map((key) => ({ header: key, key }));
 
-    const devDocs = docs.filter(
+    const devDocs = (docs as NFeDoc[]).filter(
       (doc) => doc.nfeProc.NFe.infNFe.ide.finNFe == "4",
     );
 

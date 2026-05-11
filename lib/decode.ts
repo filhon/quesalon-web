@@ -15,7 +15,10 @@ export function decodeLote(base64List: string[]): NFeDoc[] {
       const parsed = parser.parse(xml) as NFeDoc;
       docs.push(parsed);
     } catch (err) {
-      console.error("decodeLote: parse error", err);
+      console.error(
+        "decodeLote: parse error",
+        err instanceof Error ? err.message : String(err),
+      );
     }
   }
   return docs;

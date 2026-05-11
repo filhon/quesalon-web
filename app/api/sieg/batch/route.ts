@@ -1,12 +1,44 @@
 import { decodeLote } from "@/lib/decode";
+import { COMPANIES } from "@/lib/constants";
+import {
+  requireAuth,
+  unauthorizedResponse,
+  AuthError,
+} from "@/lib/auth-server";
 
 const SIEG_URL = "https://api.sieg.com/BaixarXmls";
 const PAGE_SIZE = 50;
+const MAX_PAGES = 100;
 const FETCH_TIMEOUT_MS = 30_000;
+
+const ALLOWED_CNPJS = new Set(COMPANIES.map((c) => c.cnpj));
+const VALID_XML_TYPES = new Set([1, 2, 3, 4, 5]);
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 export async function POST(request: Request) {
   try {
+    await requireAuth(request);
+  } catch (err) {
+    if (err instanceof AuthError) return unauthorizedResponse();
+    return Response.json({ error: "Auth error" }, { status: 500 });
+  }
+
+  try {
     const { cnpj, startDate, endDate, xmlType } = await request.json();
+
+    if (!cnpj || !ALLOWED_CNPJS.has(cnpj)) {
+      return Response.json({ error: "Invalid CNPJ" }, { status: 400 });
+    }
+    if (!DATE_RE.test(startDate) || !DATE_RE.test(endDate)) {
+      return Response.json(
+        { error: "Invalid date format (YYYY-MM-DD)" },
+        { status: 400 },
+      );
+    }
+    const xmlTypeNum = xmlType ?? 1;
+    if (!VALID_XML_TYPES.has(Number(xmlTypeNum))) {
+      return Response.json({ error: "Invalid xmlType" }, { status: 400 });
+    }
 
     const apiKey = process.env.SIEG_API_KEY;
     if (!apiKey) {
@@ -19,10 +51,11 @@ export async function POST(request: Request) {
     const url = `${SIEG_URL}?api_key=${apiKey}`;
     const accumulated: string[] = [];
     let skip = 0;
+    let pages = 0;
 
-    while (true) {
+    while (pages < MAX_PAGES) {
       const payload = {
-        XmlType: xmlType ?? 1,
+        XmlType: xmlTypeNum,
         Take: PAGE_SIZE,
         Skip: skip,
         DataEmissaoInicio: startDate,
@@ -56,6 +89,8 @@ export async function POST(request: Request) {
       if (page.length === 0) break;
 
       accumulated.push(...page);
+      pages++;
+
       if (page.length < PAGE_SIZE) break;
 
       skip += PAGE_SIZE;

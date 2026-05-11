@@ -7,5 +7,5 @@ export const COMPANIES: Company[] = [
   { label: "INFAN", cnpj: "08939548000103" },
 ];
 
-export const SIEG_EMAIL = process.env.SIEG_EMAIL!;
-export const SIEG_API_KEY = process.env.SIEG_API_KEY!;
+export const SIEG_EMAIL = process.env.SIEG_EMAIL ?? "";
+export const SIEG_API_KEY = process.env.SIEG_API_KEY ?? "";

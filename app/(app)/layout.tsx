@@ -34,17 +34,26 @@ function AppHeader() {
   const { resolvedTheme, setTheme } = useTheme();
 
   useEffect(() => {
+    let unsubDb: (() => void) | undefined;
+
     const unsubAuth = onAuthStateChanged(auth, (user) => {
       setUserEmail(user?.email ?? null);
+
+      unsubDb?.();
+      unsubDb = undefined;
+
+      if (user) {
+        const loginRef = ref(db, `log-login/${user.uid}`);
+        unsubDb = onValue(loginRef, (snap) => {
+          const val = snap.val();
+          if (val?.data) setLastAccess(val.data as string);
+        });
+      }
     });
-    const loginRef = ref(db, "log-login");
-    const unsubDb = onValue(loginRef, (snap) => {
-      const val = snap.val();
-      if (val?.data) setLastAccess(val.data as string);
-    });
+
     return () => {
       unsubAuth();
-      unsubDb();
+      unsubDb?.();
     };
   }, []);
 

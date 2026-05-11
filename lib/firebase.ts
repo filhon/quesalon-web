@@ -4,12 +4,12 @@ import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: "login-quesalon.firebaseapp.com",
-  databaseURL: "https://login-quesalon-default-rtdb.firebaseio.com",
-  projectId: "login-quesalon",
-  storageBucket: "login-quesalon.appspot.com",
-  messagingSenderId: "696199230846",
-  appId: "1:696199230846:web:bc3f35fced322a416d2f2f",
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 export const app = getApps().length ? getApp() : initializeApp(firebaseConfig);

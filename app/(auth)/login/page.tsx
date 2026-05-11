@@ -46,11 +46,16 @@ export default function LoginPage() {
       );
       const idToken = await credential.user.getIdToken();
 
-      // Persist session token in cookie (24h)
-      document.cookie = `session=${idToken}; path=/; max-age=${60 * 60 * 24}; SameSite=Lax`;
+      // Exchange ID token for a server-side HttpOnly session cookie
+      const sessionRes = await fetch("/api/auth/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+      });
+      if (!sessionRes.ok) throw new Error("Session creation failed");
 
-      // Log login in Firebase RTDB
-      await update(ref(db, "log-login"), {
+      // Log login per user in Firebase RTDB
+      await update(ref(db, `log-login/${credential.user.uid}`), {
         data: formatTimestamp(new Date()),
         "e-mail": email,
       });

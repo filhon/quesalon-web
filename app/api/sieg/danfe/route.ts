@@ -1,7 +1,26 @@
+import {
+  requireAuth,
+  unauthorizedResponse,
+  AuthError,
+} from "@/lib/auth-server";
+
+const KEY_RE = /^\d{44}$/;
+
 export async function GET(request: Request) {
+  try {
+    await requireAuth(request);
+  } catch (err) {
+    if (err instanceof AuthError) return unauthorizedResponse();
+    return Response.json({ error: "Auth error" }, { status: 500 });
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const key = searchParams.get("key");
+
+    if (!key || !KEY_RE.test(key)) {
+      return Response.json({ error: "Invalid key" }, { status: 400 });
+    }
 
     const apiKey = process.env.SIEG_API_KEY;
 
