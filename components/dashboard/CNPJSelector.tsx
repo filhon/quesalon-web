@@ -1,0 +1,55 @@
+"use client";
+
+import { COMPANIES } from "@/lib/constants";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { Company } from "@/lib/types";
+
+function formatCnpj(raw: string): string {
+  return raw.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
+}
+
+interface Props {
+  value: Company;
+  onSelect: (company: Company) => void;
+}
+
+export function CNPJSelector({ value, onSelect }: Props) {
+  function handleChange(cnpj: string) {
+    const found = COMPANIES.find((c) => c.cnpj === cnpj);
+    if (found) onSelect(found);
+  }
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <Label className="text-zinc-400 text-xs uppercase tracking-wider">
+        Empresa / CNPJ
+      </Label>
+      <Select value={value.cnpj} onValueChange={handleChange}>
+        <SelectTrigger className="w-full h-9 bg-zinc-800/60 border-zinc-700/50 text-zinc-100 focus:border-amber-400/50 focus:ring-amber-400/20">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="bg-zinc-900 border-zinc-700">
+          {COMPANIES.map((c) => (
+            <SelectItem
+              key={c.cnpj}
+              value={c.cnpj}
+              className="text-zinc-300 focus:bg-zinc-800 focus:text-zinc-100"
+            >
+              <span className="font-medium">{c.label}</span>
+              <span className="ml-2 font-mono text-xs text-zinc-500">
+                {formatCnpj(c.cnpj)}
+              </span>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
