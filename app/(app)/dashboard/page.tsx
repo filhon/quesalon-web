@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { format } from "date-fns";
 import { Loader2, Search } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { CNPJSelector } from "@/components/dashboard/CNPJSelector";
@@ -24,18 +26,29 @@ export default function DashboardPage() {
   const [log, setLog] = useState<string[]>([]);
 
   async function handleVerify() {
+    if (!company) {
+      toast.error("Selecione uma empresa");
+      return;
+    }
+    if (!dateRange?.from || !dateRange?.to) {
+      toast.error("Selecione o período");
+      return;
+    }
+
     setLoading(true);
-    setLog([`⚠ Buscando NF-es para ${company.label}…`]);
+    setLog([]);
+    setResult(null);
 
     try {
+      const startDate = format(dateRange.from, "yyyy-MM-dd");
+      const endDate = format(dateRange.to, "yyyy-MM-dd");
+
+      setLog([`⚠ Buscando NF-es para ${company.label}…`]);
+
       const batchRes = await fetch("/api/sieg/batch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          cnpj: company.cnpj,
-          startDate: dateRange.from.toISOString().slice(0, 10),
-          endDate: dateRange.to.toISOString().slice(0, 10),
-        }),
+        body: JSON.stringify({ cnpj: company.cnpj, startDate, endDate }),
       });
 
       if (!batchRes.ok) throw new Error("Erro ao buscar notas");
@@ -44,6 +57,10 @@ export default function DashboardPage() {
         docs: NFeDoc[];
         total: number;
       };
+
+      if (total === 0) {
+        toast.warning("Nenhuma nota encontrada no período");
+      }
 
       setLog((prev) => [...prev, `✓ ${total} nota(s) encontrada(s)`]);
 
@@ -57,9 +74,11 @@ export default function DashboardPage() {
       ]);
 
       setResult(verificationResult);
+      toast.success(`${total} nota(s) verificada(s)`);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erro desconhecido";
       setLog((prev) => [...prev, `✗ ${message}`]);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -119,7 +138,7 @@ export default function DashboardPage() {
             desc={result ? result.cnpjDesc.length : 0}
           />
 
-          <DownloadPanel result={result} />
+          <DownloadPanel result={result} loading={loading} />
         </div>
       </div>
     </div>

@@ -1,97 +1,260 @@
 "use client";
 
-import { Download, FileSpreadsheet, Archive } from "lucide-react";
+import { useState } from "react";
+import { FileCode, FileText, Sheet, Archive, Download } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import type { VerificationResult } from "@/lib/types";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { fetchAndDownload } from "@/lib/download-utils";
+import type { NFeDoc, VerificationResult } from "@/lib/types";
 
 interface Props {
   result: VerificationResult | null;
+  loading: boolean;
 }
 
-export function DownloadPanel({ result }: Props) {
-  const disabled = result === null;
+function getKey(doc: NFeDoc): string {
+  return doc.nfeProc.protNFe.infProt.chNFe;
+}
+
+export function DownloadPanel({ result, loading }: Props) {
+  const [accessKey, setAccessKey] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const disabled = result === null || loading;
+
+  async function run(id: string, fn: () => Promise<void>) {
+    setBusy(id);
+    try {
+      await fn();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Erro desconhecido";
+      toast.error(msg);
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function handleBatchZip(
+    docs: NFeDoc[],
+    type: "xml" | "danfe",
+    label: string,
+  ) {
+    const keys = docs.map(getKey);
+    if (keys.length === 0) {
+      toast.warning("Nenhuma nota encontrada");
+      return;
+    }
+    toast.info(`Preparando download: ${label}…`);
+    await fetchAndDownload(
+      "/api/download/zip",
+      "POST",
+      { keys, type },
+      `quesalon_${type}_${Date.now()}.zip`,
+    );
+  }
+
+  async function handleSingleXml() {
+    const key = accessKey.trim();
+    if (key.length !== 44) {
+      toast.warning("A chave de acesso deve ter 44 dígitos");
+      return;
+    }
+    toast.info("Preparando download XML…");
+    await fetchAndDownload(
+      `/api/sieg/xml?key=${key}&type=55`,
+      "GET",
+      undefined,
+      `${key}.xml`,
+    );
+  }
+
+  async function handleSingleDanfe() {
+    const key = accessKey.trim();
+    if (key.length !== 44) {
+      toast.warning("A chave de acesso deve ter 44 dígitos");
+      return;
+    }
+    toast.info("Preparando download DANFE…");
+    await fetchAndDownload(
+      `/api/sieg/danfe?key=${key}`,
+      "GET",
+      undefined,
+      `${key}.pdf`,
+    );
+  }
 
   async function handleExcel() {
     if (!result) return;
-    const res = await fetch("/api/report", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ docs: result.dev }),
-    });
-    if (!res.ok) return;
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "relatorio.xlsx";
-    a.click();
-    URL.revokeObjectURL(url);
+    toast.info("Gerando relatório Excel…");
+    await fetchAndDownload(
+      "/api/report",
+      "POST",
+      { docs: result.dev },
+      "relatorio_quesalon.xlsx",
+    );
   }
 
-  async function handleZip(type: "xml" | "danfe") {
-    if (!result) return;
-    const keys = result.dev.map((d) => d.nfeProc.protNFe.infProt.chNFe);
-    const res = await fetch("/api/download/zip", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ keys, type }),
-    });
-    if (!res.ok) return;
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${type === "xml" ? "xmls" : "danfes"}.zip`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
+  const allKeys = result ? [...result.dev, ...result.notDev] : [];
 
   return (
     <Card className="bg-zinc-900/60 border-zinc-800">
-      <CardContent className="p-4 flex flex-col gap-3">
-        <p className="text-zinc-400 text-xs uppercase tracking-wider">
+      <CardHeader className="px-5 pt-5 pb-0">
+        <p className="text-zinc-400 text-xs uppercase tracking-wider font-medium">
           Downloads
         </p>
+      </CardHeader>
 
+      <CardContent className="p-5 flex flex-col gap-5">
+        {/* Batch downloads */}
         <div className="flex flex-col gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={disabled}
-            onClick={handleExcel}
-            className="justify-start gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
-          >
-            <FileSpreadsheet className="size-4 text-emerald-400" />
-            Relatório Excel (.xlsx)
-          </Button>
+          <p className="text-zinc-500 text-xs font-medium">Downloads em Lote</p>
 
           <Button
             variant="outline"
             size="sm"
-            disabled={disabled}
-            onClick={() => handleZip("xml")}
+            disabled={disabled || busy !== null}
+            onClick={() =>
+              run("all-xml", () =>
+                handleBatchZip(allKeys, "xml", "Todos (XML)"),
+              )
+            }
             className="justify-start gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
           >
             <Archive className="size-4 text-blue-400" />
-            XMLs das devoluções (.zip)
+            Todos (XML)
+            {busy === "all-xml" && (
+              <span className="ml-auto text-zinc-500 text-xs">…</span>
+            )}
           </Button>
 
           <Button
             variant="outline"
             size="sm"
-            disabled={disabled}
-            onClick={() => handleZip("danfe")}
+            disabled={disabled || busy !== null}
+            onClick={() =>
+              run("dev-xml", () =>
+                handleBatchZip(result!.dev, "xml", "Devoluções (XML)"),
+              )
+            }
             className="justify-start gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
           >
-            <Download className="size-4 text-amber-400" />
-            DANFEs das devoluções (.zip)
+            <Archive className="size-4 text-amber-400" />
+            Devoluções (XML)
+            {busy === "dev-xml" && (
+              <span className="ml-auto text-zinc-500 text-xs">…</span>
+            )}
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={disabled || busy !== null}
+            onClick={() =>
+              run("desc-xml", () =>
+                handleBatchZip(result!.cnpjDesc, "xml", "Desacordos (XML)"),
+              )
+            }
+            className="justify-start gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
+          >
+            <Archive className="size-4 text-red-400" />
+            Desacordos (XML)
+            {busy === "desc-xml" && (
+              <span className="ml-auto text-zinc-500 text-xs">…</span>
+            )}
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={disabled || busy !== null}
+            onClick={() =>
+              run("dev-danfe", () =>
+                handleBatchZip(result!.dev, "danfe", "Devoluções (DANFE)"),
+              )
+            }
+            className="justify-start gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
+          >
+            <Download className="size-4 text-emerald-400" />
+            Devoluções (PDF/DANFE)
+            {busy === "dev-danfe" && (
+              <span className="ml-auto text-zinc-500 text-xs">…</span>
+            )}
           </Button>
         </div>
 
-        {disabled && (
+        <Separator className="bg-zinc-800" />
+
+        {/* Per access key */}
+        <div className="flex flex-col gap-2">
+          <p className="text-zinc-500 text-xs font-medium">
+            Por Chave de Acesso
+          </p>
+
+          <Input
+            value={accessKey}
+            onChange={(e) =>
+              setAccessKey(e.target.value.replace(/\D/g, "").slice(0, 44))
+            }
+            placeholder="Digite a chave de acesso (44 dígitos)"
+            maxLength={44}
+            className="h-9 bg-zinc-800/60 border-zinc-700/50 text-zinc-100 placeholder:text-zinc-600 text-xs font-mono"
+          />
+
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={busy !== null}
+              onClick={() => run("key-xml", handleSingleXml)}
+              className="flex-1 justify-center gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
+              aria-label="Baixar XML por chave de acesso"
+            >
+              <FileCode className="size-4 text-blue-400" />
+              XML
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={busy !== null}
+              onClick={() => run("key-danfe", handleSingleDanfe)}
+              className="flex-1 justify-center gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
+              aria-label="Baixar DANFE por chave de acesso"
+            >
+              <FileText className="size-4 text-amber-400" />
+              DANFE
+            </Button>
+          </div>
+        </div>
+
+        <Separator className="bg-zinc-800" />
+
+        {/* Report */}
+        <div className="flex flex-col gap-2">
+          <p className="text-zinc-500 text-xs font-medium">Relatório</p>
+
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={disabled || busy !== null}
+            onClick={() => run("excel", handleExcel)}
+            className="justify-start gap-2 bg-zinc-800/40 border-zinc-700/50 text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 disabled:opacity-40"
+            aria-label="Gerar relatório Excel"
+          >
+            <Sheet className="size-4 text-emerald-400" />
+            Gerar Excel (.xlsx)
+            {busy === "excel" && (
+              <span className="ml-auto text-zinc-500 text-xs">…</span>
+            )}
+          </Button>
+        </div>
+
+        {disabled && !loading && (
           <p className="text-zinc-600 text-xs">
-            Execute uma verificação para habilitar os downloads.
+            Execute uma verificação para habilitar os downloads em lote.
           </p>
         )}
       </CardContent>
