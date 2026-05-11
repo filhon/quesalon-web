@@ -17,25 +17,30 @@ export function verifyNFe(docs: NFeDoc[], cnpj: string): VerificationResult {
   }
 
   for (const doc of dev) {
-    const chNFe = doc.nfeProc?.protNFe?.infProt?.chNFe ?? "(sem chave)";
+    const chNFe = String(doc.nfeProc?.protNFe?.infProt?.chNFe ?? "");
+    const cnpjDev = chNFe.length >= 20 ? chNFe.substring(6, 20) : chNFe;
     try {
-      const refNFe = doc.nfeProc.NFe.infNFe.ide.NFref?.refNFe;
-      if (refNFe) {
+      const nfRef = doc.nfeProc.NFe.infNFe.ide.NFref;
+      // NFref pode ser objeto único ou array quando há múltiplas referências
+      const refNFe = String(
+        Array.isArray(nfRef) ? nfRef[0]?.refNFe : nfRef?.refNFe,
+      );
+      if (refNFe && refNFe !== "undefined") {
         const cnpjRef = refNFe.substring(6, 20);
         if (cnpjRef === cnpj) {
           cnpjAcor.push(doc);
-          log.push(`✓ acordo: ${chNFe}`);
+          log.push(`✓ acordo: ${cnpjDev}`);
         } else {
           cnpjDesc.push(doc);
-          log.push(`✗ desacordo: ${chNFe}`);
+          log.push(`✗ desacordo: ${cnpjDev} (ref: ${cnpjRef} ≠ ${cnpj})`);
         }
       } else {
         cnpjDesc.push(doc);
-        log.push(`✗ desacordo: ${chNFe}`);
+        log.push(`✗ desacordo: ${cnpjDev} (sem nota referenciada)`);
       }
     } catch {
       cnpjDesc.push(doc);
-      log.push(`⚠ atenção: ${chNFe}`);
+      log.push(`⚠ atenção: ${cnpjDev}`);
     }
   }
 

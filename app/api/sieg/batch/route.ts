@@ -46,9 +46,14 @@ export async function POST(request: Request) {
         );
       }
 
-      const page: string[] = await res.json();
+      const raw = await res.json();
+      const page: string[] = Array.isArray(raw)
+        ? raw
+        : Array.isArray(JSON.parse(raw))
+          ? JSON.parse(raw)
+          : [];
 
-      if (!Array.isArray(page) || page.length === 0) break;
+      if (page.length === 0) break;
 
       accumulated.push(...page);
       if (page.length < PAGE_SIZE) break;

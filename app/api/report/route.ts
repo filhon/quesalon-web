@@ -43,7 +43,8 @@ export async function POST(request: Request) {
       const { ide, emit, dest, total, infAdic } = doc.nfeProc.NFe.infNFe;
       const { protNFe } = doc.nfeProc;
 
-      const refNFe = ide.NFref?.refNFe;
+      const refNFe =
+        ide.NFref?.refNFe != null ? String(ide.NFref.refNFe) : undefined;
       const uf = emit.enderEmit.UF;
 
       const cdUnd = dest.CNPJ && uf === "PB" ? 1 : 26;
@@ -80,7 +81,7 @@ export async function POST(request: Request) {
         lead_time: "",
         transportadoras: "",
         ocorrencia: "",
-        chave_acesso: protNFe.infProt.chNFe,
+        chave_acesso: String(protNFe.infProt.chNFe),
         obs: "",
       });
     }

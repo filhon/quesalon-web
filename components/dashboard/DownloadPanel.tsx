@@ -23,7 +23,7 @@ interface Props {
 }
 
 function getKey(doc: NFeDoc): string {
-  return doc.nfeProc.protNFe.infProt.chNFe;
+  return String(doc.nfeProc.protNFe.infProt.chNFe);
 }
 
 export function DownloadPanel({ result, loading }: Props) {
