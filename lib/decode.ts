@@ -3,7 +3,7 @@ import type { NFeDoc } from "./types";
 
 const parser = new XMLParser({
   ignoreAttributes: false,
-  parseAttributeValues: true,
+  parseAttributeValue: true,
 });
 
 export function decodeLote(base64List: string[]): NFeDoc[] {

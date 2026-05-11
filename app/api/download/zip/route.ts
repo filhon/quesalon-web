@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
     const timestamp = Date.now();
 
-    return new Response(zipBuffer, {
+    return new Response(new Uint8Array(zipBuffer), {
       headers: {
         "Content-Type": "application/zip",
         "Content-Disposition": `attachment; filename="quesalon_${timestamp}.zip"`,

@@ -9,7 +9,7 @@ export function verifyNFe(docs: NFeDoc[], cnpj: string): VerificationResult {
 
   for (const doc of docs) {
     const finNFe = doc.nfeProc?.NFe?.infNFe?.ide?.finNFe;
-    if (finNFe == "4" || finNFe == 4) {
+    if (String(finNFe) === "4") {
       dev.push(doc);
     } else {
       notDev.push(doc);
