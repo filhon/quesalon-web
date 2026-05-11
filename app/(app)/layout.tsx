@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Syne } from "next/font/google";
-import { LogOut, Layers, Mail, Clock, Sun, Moon } from "lucide-react";
+import { LogOut, Mail, Clock, Sun, Moon } from "lucide-react";
+import { QuesalonLogo } from "@/components/quesalon-logo";
 import { onAuthStateChanged } from "firebase/auth";
 import { ref, onValue } from "firebase/database";
 import { signOut } from "@/lib/auth-actions";
@@ -48,17 +49,15 @@ function AppHeader() {
   }, []);
 
   return (
-    <header
-      className="fixed top-0 inset-x-0 z-30 h-14 border-b border-border bg-background/90 backdrop-blur-sm"
-      style={{ fontFamily: "var(--font-syne)" }}
-    >
+    <header className="fixed top-0 inset-x-0 z-30 h-14 border-b border-border bg-background/90 backdrop-blur-sm">
       <div className="flex h-full items-center justify-between px-6">
         {/* Logo */}
         <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-400/10 border border-amber-400/20">
-            <Layers className="size-3.5 text-amber-400" aria-hidden="true" />
-          </div>
-          <span className="text-sm font-semibold tracking-tight text-foreground">
+          <QuesalonLogo className="size-7 text-amber-400" />
+          <span
+            className="text-sm font-semibold tracking-tight text-foreground"
+            style={{ fontFamily: "var(--font-syne)" }}
+          >
             Quesalon <span className="text-amber-400">RPA</span>
           </span>
         </div>
@@ -127,7 +126,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <h1 className="sr-only">
           Quesalon RPA — Sistema de Verificação Fiscal
         </h1>
-        <main className="pt-14 p-4 md:p-6 min-h-screen">{children}</main>
+        <main className="pt-18 px-4 pb-4 md:px-6 md:pb-6 min-h-screen">
+          {children}
+        </main>
       </div>
     </CompanyProvider>
   );

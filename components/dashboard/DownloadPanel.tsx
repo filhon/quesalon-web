@@ -122,81 +122,79 @@ export function DownloadPanel({ result, loading }: Props) {
             Downloads em Lote
           </p>
 
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={disabled || busy !== null}
-            onClick={() =>
-              run("all-xml", () =>
-                handleBatchZip(allKeys, "xml", "Todos (XML)"),
-              )
-            }
-            className="justify-start gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
-            aria-label="Baixar todos os XMLs em ZIP"
-          >
-            <Archive className="size-4 text-blue-500 dark:text-blue-400" />
-            Todos (XML)
-            {busy === "all-xml" && (
-              <Loader2 className="ml-auto size-3.5 animate-spin text-muted-foreground" />
-            )}
-          </Button>
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              variant="outline"
+              disabled={disabled || busy !== null}
+              onClick={() =>
+                run("all-xml", () =>
+                  handleBatchZip(allKeys, "xml", "Todos (XML)"),
+                )
+              }
+              className="h-10 justify-start gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
+              aria-label="Baixar todos os XMLs em ZIP"
+            >
+              <Archive className="size-4 shrink-0 text-blue-500 dark:text-blue-400" />
+              <span className="truncate text-sm">Todos (XML)</span>
+              {busy === "all-xml" && (
+                <Loader2 className="ml-auto size-3.5 shrink-0 animate-spin text-muted-foreground" />
+              )}
+            </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={disabled || busy !== null}
-            onClick={() =>
-              run("dev-xml", () =>
-                handleBatchZip(result!.dev, "xml", "Devoluções (XML)"),
-              )
-            }
-            className="justify-start gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
-            aria-label="Baixar XMLs de devoluções em ZIP"
-          >
-            <Archive className="size-4 text-amber-500 dark:text-amber-400" />
-            Devoluções (XML)
-            {busy === "dev-xml" && (
-              <Loader2 className="ml-auto size-3.5 animate-spin text-muted-foreground" />
-            )}
-          </Button>
+            <Button
+              variant="outline"
+              disabled={disabled || busy !== null}
+              onClick={() =>
+                run("dev-xml", () =>
+                  handleBatchZip(result!.dev, "xml", "Devoluções (XML)"),
+                )
+              }
+              className="h-10 justify-start gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
+              aria-label="Baixar XMLs de devoluções em ZIP"
+            >
+              <Archive className="size-4 shrink-0 text-amber-500 dark:text-amber-400" />
+              <span className="truncate text-sm">Devoluções (XML)</span>
+              {busy === "dev-xml" && (
+                <Loader2 className="ml-auto size-3.5 shrink-0 animate-spin text-muted-foreground" />
+              )}
+            </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={disabled || busy !== null}
-            onClick={() =>
-              run("desc-xml", () =>
-                handleBatchZip(result!.cnpjDesc, "xml", "Desacordos (XML)"),
-              )
-            }
-            className="justify-start gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
-            aria-label="Baixar XMLs de desacordos em ZIP"
-          >
-            <Archive className="size-4 text-red-500 dark:text-red-400" />
-            Desacordos (XML)
-            {busy === "desc-xml" && (
-              <Loader2 className="ml-auto size-3.5 animate-spin text-muted-foreground" />
-            )}
-          </Button>
+            <Button
+              variant="outline"
+              disabled={disabled || busy !== null}
+              onClick={() =>
+                run("desc-xml", () =>
+                  handleBatchZip(result!.cnpjDesc, "xml", "Desacordos (XML)"),
+                )
+              }
+              className="h-10 justify-start gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
+              aria-label="Baixar XMLs de desacordos em ZIP"
+            >
+              <Archive className="size-4 shrink-0 text-red-500 dark:text-red-400" />
+              <span className="truncate text-sm">Desacordos (XML)</span>
+              {busy === "desc-xml" && (
+                <Loader2 className="ml-auto size-3.5 shrink-0 animate-spin text-muted-foreground" />
+              )}
+            </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={disabled || busy !== null}
-            onClick={() =>
-              run("dev-danfe", () =>
-                handleBatchZip(result!.dev, "danfe", "Devoluções (DANFE)"),
-              )
-            }
-            className="justify-start gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
-            aria-label="Baixar DANFEs de devoluções em ZIP"
-          >
-            <Download className="size-4 text-emerald-500 dark:text-emerald-400" />
-            Devoluções (PDF/DANFE)
-            {busy === "dev-danfe" && (
-              <Loader2 className="ml-auto size-3.5 animate-spin text-muted-foreground" />
-            )}
-          </Button>
+            <Button
+              variant="outline"
+              disabled={disabled || busy !== null}
+              onClick={() =>
+                run("dev-danfe", () =>
+                  handleBatchZip(result!.dev, "danfe", "Devoluções (DANFE)"),
+                )
+              }
+              className="h-10 justify-start gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
+              aria-label="Baixar DANFEs de devoluções em ZIP"
+            >
+              <Download className="size-4 shrink-0 text-emerald-500 dark:text-emerald-400" />
+              <span className="truncate text-sm">Devoluções (DANFE)</span>
+              {busy === "dev-danfe" && (
+                <Loader2 className="ml-auto size-3.5 shrink-0 animate-spin text-muted-foreground" />
+              )}
+            </Button>
+          </div>
         </div>
 
         <Separator />
@@ -227,7 +225,7 @@ export function DownloadPanel({ result, loading }: Props) {
               size="default"
               disabled={busy !== null}
               onClick={() => run("key-xml", handleSingleXml)}
-              className="flex-1 justify-center gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
+              className="h-10 flex-1 justify-center gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
               aria-label="Baixar XML por chave de acesso"
             >
               <FileCode className="size-4 text-blue-500 dark:text-blue-400" />
@@ -239,7 +237,7 @@ export function DownloadPanel({ result, loading }: Props) {
               size="default"
               disabled={busy !== null}
               onClick={() => run("key-danfe", handleSingleDanfe)}
-              className="flex-1 justify-center gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
+              className="h-10 flex-1 justify-center gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
               aria-label="Baixar DANFE por chave de acesso"
             >
               <FileText className="size-4 text-amber-500 dark:text-amber-400" />
@@ -259,7 +257,7 @@ export function DownloadPanel({ result, loading }: Props) {
             size="sm"
             disabled={disabled || busy !== null}
             onClick={() => run("excel", handleExcel)}
-            className="justify-start gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
+            className="h-10 justify-start gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
             aria-label="Gerar relatório Excel"
           >
             <Sheet className="size-4 text-emerald-500 dark:text-emerald-400" />

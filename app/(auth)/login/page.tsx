@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { ref, update } from "firebase/database";
 import { Loader2 } from "lucide-react";
+import { QuesalonLogo } from "@/components/quesalon-logo";
 import { auth, db } from "@/lib/firebase";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -70,20 +71,7 @@ export default function LoginPage() {
           {/* Logo mark */}
           <div className="flex flex-col items-center gap-4 mb-2">
             <div className="relative">
-              <div className="flex items-center gap-1.5">
-                <span
-                  className="text-3xl font-bold text-amber-400 leading-none"
-                  style={{ fontFamily: "var(--font-syne)" }}
-                >
-                  Q
-                </span>
-                <span
-                  className="text-xl font-semibold text-foreground leading-none"
-                  style={{ fontFamily: "var(--font-syne)" }}
-                >
-                  uesalon
-                </span>
-              </div>
+              <QuesalonLogo className="size-14 text-amber-400" />
             </div>
             <div className="text-center">
               <h1

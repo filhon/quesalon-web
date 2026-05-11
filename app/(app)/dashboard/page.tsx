@@ -85,15 +85,12 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="mb-6">
-        <h2
-          className="text-lg font-semibold text-foreground tracking-tight"
-          style={{ fontFamily: "var(--font-syne)" }}
-        >
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold text-foreground tracking-tight">
           Verificação Fiscal
         </h2>
-        <p className="text-muted-foreground text-sm mt-0.5">
-          Consulte e valide NF-es por empresa e período
+        <p className="text-muted-foreground text-sm mt-2 leading-relaxed">
+          NF-es por empresa e período
         </p>
       </div>
 
@@ -120,7 +117,7 @@ export default function DashboardPage() {
             aria-label={
               loading ? "Verificando notas..." : "Verificar notas fiscais"
             }
-            className="w-full h-9 bg-amber-400 hover:bg-amber-300 text-zinc-950 font-semibold transition-colors duration-200 disabled:opacity-60 gap-2"
+            className="w-full h-10 bg-amber-400 hover:bg-amber-300 text-zinc-950 font-semibold transition-colors duration-200 disabled:opacity-60 gap-2"
           >
             {loading ? (
               <>

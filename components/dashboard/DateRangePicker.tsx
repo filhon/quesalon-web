@@ -4,7 +4,6 @@ import { useState } from "react";
 import { format, startOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
-import { type DateRange } from "react-day-picker";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
@@ -33,20 +32,6 @@ export function DateRangePicker({ value, onChange, disabled }: Props) {
   const [fromOpen, setFromOpen] = useState(false);
   const [toOpen, setToOpen] = useState(false);
 
-  function handleFromSelect(range: DateRange | undefined) {
-    if (range?.from) {
-      onChange({ from: range.from, to: value.to });
-      setFromOpen(false);
-    }
-  }
-
-  function handleToSelect(range: DateRange | undefined) {
-    if (range?.from) {
-      onChange({ from: value.from, to: range.from });
-      setToOpen(false);
-    }
-  }
-
   return (
     <div className="flex flex-col gap-3">
       {/* De */}
@@ -74,9 +59,15 @@ export function DateRangePicker({ value, onChange, disabled }: Props) {
             align="start"
           >
             <Calendar
-              mode="range"
-              selected={{ from: value.from, to: value.to }}
-              onSelect={handleFromSelect}
+              mode="single"
+              selected={value.from}
+              onSelect={(date) => {
+                if (date) {
+                  onChange({ from: date, to: value.to });
+                  setFromOpen(false);
+                }
+              }}
+              disabled={{ after: value.to }}
               defaultMonth={value.from}
               locale={ptBR}
             />
@@ -109,9 +100,15 @@ export function DateRangePicker({ value, onChange, disabled }: Props) {
             align="start"
           >
             <Calendar
-              mode="range"
-              selected={{ from: value.from, to: value.to }}
-              onSelect={handleToSelect}
+              mode="single"
+              selected={value.to}
+              onSelect={(date) => {
+                if (date) {
+                  onChange({ from: value.from, to: date });
+                  setToOpen(false);
+                }
+              }}
+              disabled={{ before: value.from }}
               defaultMonth={value.to}
               locale={ptBR}
             />
