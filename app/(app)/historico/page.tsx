@@ -57,7 +57,7 @@ function TableSkeleton({ cols }: { cols: number }) {
         <tr key={i} className="border-b border-border last:border-0">
           {Array.from({ length: cols }).map((__, j) => (
             <td key={j} className="px-4 py-3">
-              <Skeleton className="h-3.5 w-full max-w-[120px]" />
+              <Skeleton className="h-3.5 w-full max-w-30" />
             </td>
           ))}
         </tr>
@@ -212,7 +212,7 @@ function VerificationsTable({
                       {formatTs(e.timestamp)}
                     </td>
                     <td
-                      className="hidden md:table-cell px-4 py-3 text-xs text-foreground max-w-[180px] truncate"
+                      className="hidden md:table-cell px-4 py-3 text-xs text-foreground max-w-45 truncate"
                       title={e.userEmail}
                     >
                       {e.userEmail}
@@ -360,7 +360,7 @@ function ReportsTable({
                       {formatTs(e.timestamp)}
                     </td>
                     <td
-                      className="hidden md:table-cell px-4 py-3 text-xs text-foreground max-w-[180px] truncate"
+                      className="hidden md:table-cell px-4 py-3 text-xs text-foreground max-w-45 truncate"
                       title={e.userEmail}
                     >
                       {e.userEmail}
