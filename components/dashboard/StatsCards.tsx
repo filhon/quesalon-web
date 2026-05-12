@@ -32,7 +32,7 @@ export function StatsCards({ total, dev, desc, loading }: Props) {
   if (loading) {
     return (
       <div className="border border-border rounded-lg bg-background/60">
-        <div className="grid grid-cols-3 divide-x divide-border">
+        <div className="grid grid-cols-1 divide-y sm:grid-cols-3 sm:divide-y-0 sm:divide-x divide-border">
           {[0, 1, 2].map((i) => (
             <div key={i} className="px-5 py-4 flex flex-col gap-2">
               <Skeleton className="w-24 h-3" />
@@ -46,7 +46,7 @@ export function StatsCards({ total, dev, desc, loading }: Props) {
 
   return (
     <div className="border border-border rounded-lg bg-background/60">
-      <div className="grid grid-cols-3 divide-x divide-border">
+      <div className="grid grid-cols-1 divide-y sm:grid-cols-3 sm:divide-y-0 sm:divide-x divide-border">
         <StatItem
           label="Total verificadas"
           value={total}

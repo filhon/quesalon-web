@@ -62,13 +62,13 @@ function AppHeader() {
 
   return (
     <header className="fixed top-0 inset-x-0 z-30 h-14 border-b border-border bg-background/90 backdrop-blur-sm">
-      <div className="flex h-full items-center justify-between px-6">
+      <div className="flex h-full items-center justify-between px-4 sm:px-6">
         {/* Logo + Nav */}
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-3 sm:gap-5">
           <div className="flex items-center gap-2.5">
             <QuesalonLogo className="size-7 text-amber-400" />
             <span
-              className="text-sm font-semibold tracking-tight text-foreground"
+              className="hidden sm:inline text-sm font-semibold tracking-tight text-foreground"
               style={{ fontFamily: "var(--font-syne)" }}
             >
               Quesalon <span className="text-amber-400">RPA</span>
@@ -105,7 +105,7 @@ function AppHeader() {
         {/* Center: selected company badge */}
         <Badge
           variant="outline"
-          className="flex border-border bg-card text-foreground font-mono text-xs gap-2 px-3 py-1"
+          className="hidden sm:flex border-border bg-card text-foreground font-mono text-xs gap-2 px-3 py-1"
         >
           <span className="text-muted-foreground">{company.label}</span>
           <span className="text-amber-400/70">{formatCnpj(company.cnpj)}</span>

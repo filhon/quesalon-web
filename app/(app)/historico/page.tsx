@@ -167,19 +167,19 @@ function VerificationsTable({
             <thead>
               <tr className="border-b border-border bg-muted/30">
                 {[
-                  "Data/hora",
-                  "Usuário",
-                  "Empresa",
-                  "Período",
-                  "Total",
-                  "Dev.",
-                  "Desc.",
-                ].map((h) => (
+                  { label: "Data/hora", cls: "" },
+                  { label: "Usuário", cls: "hidden md:table-cell" },
+                  { label: "Empresa", cls: "" },
+                  { label: "Período", cls: "" },
+                  { label: "Total", cls: "hidden md:table-cell" },
+                  { label: "Dev.", cls: "" },
+                  { label: "Desc.", cls: "" },
+                ].map(({ label, cls }) => (
                   <th
-                    key={h}
-                    className="px-4 py-2.5 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap"
+                    key={label}
+                    className={`px-4 py-2.5 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap ${cls}`}
                   >
-                    {h}
+                    {label}
                   </th>
                 ))}
               </tr>
@@ -212,24 +212,30 @@ function VerificationsTable({
                       {formatTs(e.timestamp)}
                     </td>
                     <td
-                      className="px-4 py-3 text-xs text-foreground max-w-[180px] truncate"
+                      className="hidden md:table-cell px-4 py-3 text-xs text-foreground max-w-[180px] truncate"
                       title={e.userEmail}
                     >
                       {e.userEmail}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className="text-xs text-foreground">
-                        {e.company.label}
-                      </span>
-                      <span className="ml-1.5 text-xs text-muted-foreground font-mono">
-                        {formatCnpj(e.company.cnpj)}
-                      </span>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs text-foreground">
+                          {e.company.label}
+                        </span>
+                        <span className="text-xs text-muted-foreground font-mono">
+                          {formatCnpj(e.company.cnpj)}
+                        </span>
+                      </div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap tabular-nums">
-                      {formatDate(e.dateRange.from)} →{" "}
-                      {formatDate(e.dateRange.to)}
+                    <td className="px-4 py-3 text-xs text-muted-foreground tabular-nums">
+                      <div className="flex flex-col gap-0.5">
+                        <span>{formatDate(e.dateRange.from)}</span>
+                        <span className="text-muted-foreground/60">
+                          {formatDate(e.dateRange.to)}
+                        </span>
+                      </div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-foreground tabular-nums font-medium">
+                    <td className="hidden md:table-cell px-4 py-3 text-xs text-foreground tabular-nums font-medium">
                       {e.counts.total.toLocaleString("pt-BR")}
                     </td>
                     <td className="px-4 py-3 text-xs text-blue-500 dark:text-blue-400 tabular-nums font-medium">
@@ -310,18 +316,18 @@ function ReportsTable({
             <thead>
               <tr className="border-b border-border bg-muted/30">
                 {[
-                  "Data/hora",
-                  "Usuário",
-                  "Empresa",
-                  "Período",
-                  "Devoluções",
-                  "Arquivo",
-                ].map((h) => (
+                  { label: "Data/hora", cls: "" },
+                  { label: "Usuário", cls: "hidden md:table-cell" },
+                  { label: "Empresa", cls: "" },
+                  { label: "Período", cls: "" },
+                  { label: "Devoluções", cls: "" },
+                  { label: "Arquivo", cls: "" },
+                ].map(({ label, cls }) => (
                   <th
-                    key={h}
-                    className="px-4 py-2.5 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap"
+                    key={label}
+                    className={`px-4 py-2.5 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider whitespace-nowrap ${cls}`}
                   >
-                    {h}
+                    {label}
                   </th>
                 ))}
               </tr>
@@ -354,22 +360,28 @@ function ReportsTable({
                       {formatTs(e.timestamp)}
                     </td>
                     <td
-                      className="px-4 py-3 text-xs text-foreground max-w-[180px] truncate"
+                      className="hidden md:table-cell px-4 py-3 text-xs text-foreground max-w-[180px] truncate"
                       title={e.userEmail}
                     >
                       {e.userEmail}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className="text-xs text-foreground">
-                        {e.company.label}
-                      </span>
-                      <span className="ml-1.5 text-xs text-muted-foreground font-mono">
-                        {formatCnpj(e.company.cnpj)}
-                      </span>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs text-foreground">
+                          {e.company.label}
+                        </span>
+                        <span className="text-xs text-muted-foreground font-mono">
+                          {formatCnpj(e.company.cnpj)}
+                        </span>
+                      </div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap tabular-nums">
-                      {formatDate(e.dateRange.from)} →{" "}
-                      {formatDate(e.dateRange.to)}
+                    <td className="px-4 py-3 text-xs text-muted-foreground tabular-nums">
+                      <div className="flex flex-col gap-0.5">
+                        <span>{formatDate(e.dateRange.from)}</span>
+                        <span className="text-muted-foreground/60">
+                          {formatDate(e.dateRange.to)}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-xs text-blue-500 dark:text-blue-400 tabular-nums font-medium">
                       {e.devCount.toLocaleString("pt-BR")}

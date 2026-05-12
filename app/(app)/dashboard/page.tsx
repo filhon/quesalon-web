@@ -115,7 +115,7 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-[320px_1fr] gap-6 items-start">
+      <div className="grid sm:grid-cols-[260px_1fr] md:grid-cols-[320px_1fr] gap-6 items-start">
         {/* Left column */}
         <div className="flex flex-col gap-5 rounded-xl border border-border bg-card/40 p-5">
           <div className="flex flex-col gap-3">
