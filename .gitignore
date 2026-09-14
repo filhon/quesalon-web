@@ -47,3 +47,6 @@ PROMPTS.md
 
 # Skills
 .agents/
+
+# Respostas cruas da sonda da API (contêm dados fiscais reais)
+scripts/.probe-out/

@@ -50,6 +50,8 @@ export interface Company {
 
 export type XmlType = 1 | 2 | 3 | 4 | 5;
 
+export type NfeSource = "sieg" | "emiteai";
+
 export interface VerificationHistoryEntry {
   id?: string;
   timestamp: number;

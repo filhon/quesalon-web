@@ -9,3 +9,6 @@ export const COMPANIES: Company[] = [
 
 export const SIEG_EMAIL = process.env.SIEG_EMAIL ?? "";
 export const SIEG_API_KEY = process.env.SIEG_API_KEY ?? "";
+
+/** SIEG desligado de vez: só Emite Aí, e os serviços exclusivos do SIEG (XML/DANFE) somem da UI. */
+export const NFE_KILL_SWITCH = process.env.NEXT_PUBLIC_NFE_SOURCE === "emiteai";

@@ -13,6 +13,7 @@ import { signOut } from "@/lib/auth-actions";
 import { auth, db } from "@/lib/firebase";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SourceControl } from "@/components/dashboard/SourceControl";
 import {
   CompanyProvider,
   useCompany,
@@ -102,14 +103,19 @@ function AppHeader() {
           </nav>
         </div>
 
-        {/* Center: selected company badge */}
-        <Badge
-          variant="outline"
-          className="hidden sm:flex border-border bg-card text-foreground font-mono text-xs gap-2 px-3 py-1"
-        >
-          <span className="text-muted-foreground">{company.label}</span>
-          <span className="text-amber-400/70">{formatCnpj(company.cnpj)}</span>
-        </Badge>
+        {/* Center: selected company + data source */}
+        <div className="flex items-center gap-2">
+          <Badge
+            variant="outline"
+            className="hidden sm:flex border-border bg-card text-foreground font-mono text-xs gap-2 px-3 py-1"
+          >
+            <span className="text-muted-foreground">{company.label}</span>
+            <span className="text-amber-400/70">
+              {formatCnpj(company.cnpj)}
+            </span>
+          </Badge>
+          <SourceControl />
+        </div>
 
         {/* User info + Logout */}
         <div className="flex items-center gap-3">

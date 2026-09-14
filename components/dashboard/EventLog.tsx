@@ -25,7 +25,8 @@ export function EventLog({ log, onClear }: Props) {
   }, [log]);
 
   return (
-    <div className="flex flex-col gap-1.5">
+    // flex-1 + min-h-0: cresce até o card lateral igualar a altura da coluna da direita
+    <div className="flex flex-col flex-1 min-h-0 gap-1.5">
       <div className="flex items-center justify-between">
         <span className="text-muted-foreground text-xs uppercase tracking-wider">
           Log de eventos
@@ -43,11 +44,11 @@ export function EventLog({ log, onClear }: Props) {
       </div>
 
       <div
-        className="rounded-lg border border-border bg-card/40 overflow-hidden"
+        className="flex flex-col flex-1 min-h-0 rounded-lg border border-border bg-card/40 overflow-hidden"
         role="log"
         aria-label="Log de eventos"
       >
-        <ScrollArea className="h-48">
+        <ScrollArea className="flex-1 min-h-48">
           <div className="p-3 space-y-0.5 font-mono text-xs">
             {log.length === 0 ? (
               <p className="text-muted-foreground italic">

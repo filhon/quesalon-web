@@ -17,10 +17,10 @@ import { useCompany } from "@/components/dashboard/company-context";
 import { verifyNFe } from "@/lib/verify";
 import { saveVerificationHistory, saveReportHistory } from "@/lib/history";
 import { auth } from "@/lib/firebase";
-import type { NFeDoc, VerificationResult } from "@/lib/types";
+import type { NFeDoc, NfeSource, VerificationResult } from "@/lib/types";
 
 export default function DashboardPage() {
-  const { company, setCompany } = useCompany();
+  const { company, setCompany, setSource, preferred } = useCompany();
   const [dateRange, setDateRange] = useState(defaultDateRange());
   const [result, setResult] = useState<VerificationResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -37,6 +37,7 @@ export default function DashboardPage() {
     }
 
     setLoading(true);
+    setSource("loading");
     setLog([]);
     setResult(null);
 
@@ -49,21 +50,42 @@ export default function DashboardPage() {
       const batchRes = await fetch("/api/sieg/batch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cnpj: company.cnpj, startDate, endDate }),
+        body: JSON.stringify({
+          cnpj: company.cnpj,
+          startDate,
+          endDate,
+          preferred,
+        }),
       });
 
       if (!batchRes.ok) throw new Error("Erro ao buscar notas");
 
-      const { docs, total } = (await batchRes.json()) as {
-        docs: NFeDoc[];
-        total: number;
-      };
+      const { docs, total, source, fallbackReason } =
+        (await batchRes.json()) as {
+          docs: NFeDoc[];
+          total: number;
+          source: NfeSource;
+          fallbackReason?: string;
+        };
+
+      setSource(source);
+      if (fallbackReason) {
+        toast.warning("SIEG indisponível — buscando no Emite Aí");
+        setLog((prev) => [
+          ...prev,
+          `✗ SIEG indisponível: ${fallbackReason}`,
+          "⚠ Alternando para o Emite Aí…",
+        ]);
+      }
 
       if (total === 0) {
         toast.warning("Nenhuma nota encontrada no período");
       }
 
-      setLog((prev) => [...prev, `✓ ${total} nota(s) encontrada(s)`]);
+      setLog((prev) => [
+        ...prev,
+        `✓ ${total} nota(s) encontrada(s) via ${source === "sieg" ? "SIEG" : "Emite Aí"}`,
+      ]);
 
       const verificationResult = verifyNFe(docs, company.cnpj);
 
@@ -97,6 +119,7 @@ export default function DashboardPage() {
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erro desconhecido";
+      setSource(null);
       setLog((prev) => [...prev, `✗ ${message}`]);
       toast.error(message);
     } finally {
@@ -115,7 +138,7 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid sm:grid-cols-[260px_1fr] md:grid-cols-[320px_1fr] gap-6 items-start">
+      <div className="grid sm:grid-cols-[260px_1fr] md:grid-cols-[320px_1fr] gap-6">
         {/* Left column */}
         <div className="flex flex-col gap-5 rounded-xl border border-border bg-card/40 p-5">
           <div className="flex flex-col gap-3">
