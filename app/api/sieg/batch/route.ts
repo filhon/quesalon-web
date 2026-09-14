@@ -8,6 +8,8 @@ import {
 
 const ALLOWED_CNPJS = new Set(COMPANIES.map((c) => c.cnpj));
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+// limita o fan-out paralelo do emiteai.ts (1 chamada upstream por fatia de 28 dias)
+const MAX_RANGE_DAYS = 366;
 
 export async function POST(request: Request) {
   try {
@@ -26,6 +28,13 @@ export async function POST(request: Request) {
     if (!DATE_RE.test(startDate) || !DATE_RE.test(endDate)) {
       return Response.json(
         { error: "Invalid date format (YYYY-MM-DD)" },
+        { status: 400 },
+      );
+    }
+    const rangeDays = (Date.parse(endDate) - Date.parse(startDate)) / 864e5;
+    if (!(rangeDays >= 0 && rangeDays <= MAX_RANGE_DAYS)) {
+      return Response.json(
+        { error: `Invalid date range (max ${MAX_RANGE_DAYS} days)` },
         { status: 400 },
       );
     }
