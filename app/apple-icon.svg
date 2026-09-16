@@ -1,5 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
-  <rect width="180" height="180" rx="40" fill="#1A1A1A"/>
-  <circle cx="90" cy="86" r="48" stroke="#F5A623" stroke-width="18" fill="none"/>
-  <line x1="116" y1="112" x2="140" y2="136" stroke="#F5A623" stroke-width="18" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <rect width="180" height="180" rx="40" fill="#2D2C8C"/>
+  <text x="90" y="130" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="122" font-weight="700" fill="#FFFFFF">Q</text>
 </svg>

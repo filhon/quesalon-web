@@ -168,7 +168,7 @@ export function DownloadPanel({ result, loading, onReportDownloaded }: Props) {
                   className="h-10 justify-start gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
                   aria-label="Baixar XMLs de devoluções em ZIP"
                 >
-                  <Archive className="size-4 shrink-0 text-amber-500 dark:text-amber-400" />
+                  <Archive className="size-4 shrink-0 text-primary" />
                   <span className="truncate text-sm">Devoluções (XML)</span>
                   {busy === "dev-xml" && (
                     <Loader2 className="ml-auto size-3.5 shrink-0 animate-spin text-muted-foreground" />
@@ -267,7 +267,7 @@ export function DownloadPanel({ result, loading, onReportDownloaded }: Props) {
                   className="h-10 flex-1 justify-center gap-2 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
                   aria-label="Baixar DANFE por chave de acesso"
                 >
-                  <FileText className="size-4 text-amber-500 dark:text-amber-400" />
+                  <FileText className="size-4 text-primary" />
                   DANFE
                 </Button>
               </div>

@@ -11,7 +11,8 @@ import {
   defaultDateRange,
 } from "@/components/dashboard/DateRangePicker";
 import { StatsCards } from "@/components/dashboard/StatsCards";
-import { EventLog } from "@/components/dashboard/EventLog";
+import { VerifySteps, type Step } from "@/components/dashboard/VerifySteps";
+import { DesacordosTable } from "@/components/dashboard/DesacordosTable";
 import { DownloadPanel } from "@/components/dashboard/DownloadPanel";
 import { useCompany } from "@/components/dashboard/company-context";
 import { verifyNFe } from "@/lib/verify";
@@ -24,7 +25,15 @@ export default function DashboardPage() {
   const [dateRange, setDateRange] = useState(defaultDateRange());
   const [result, setResult] = useState<VerificationResult | null>(null);
   const [loading, setLoading] = useState(false);
-  const [log, setLog] = useState<string[]>([]);
+  const [steps, setSteps] = useState<Step[]>([]);
+
+  const addStep = (label: string) =>
+    setSteps((s) => [...s, { label, status: "running" }]);
+  // Fecha o último passo (o que está "running") com o resultado
+  const endStep = (label: string, status: Step["status"] = "ok") =>
+    setSteps((s) =>
+      s.map((st, i) => (i === s.length - 1 ? { label, status } : st)),
+    );
 
   async function handleVerify() {
     if (!company) {
@@ -38,14 +47,14 @@ export default function DashboardPage() {
 
     setLoading(true);
     setSource("loading");
-    setLog([]);
+    setSteps([]);
     setResult(null);
 
     try {
       const startDate = format(dateRange.from, "yyyy-MM-dd");
       const endDate = format(dateRange.to, "yyyy-MM-dd");
 
-      setLog([`⚠ Buscando NF-es para ${company.label}…`]);
+      addStep(`Buscando NF-es de ${company.label}…`);
 
       const batchRes = await fetch("/api/sieg/batch", {
         method: "POST",
@@ -71,30 +80,25 @@ export default function DashboardPage() {
       setSource(source);
       if (fallbackReason) {
         toast.warning("SIEG indisponível — buscando no Emite Aí");
-        setLog((prev) => [
-          ...prev,
-          `✗ SIEG indisponível: ${fallbackReason}`,
-          "⚠ Alternando para o Emite Aí…",
-        ]);
+        endStep(`SIEG indisponível: ${fallbackReason}`, "warn");
+        addStep("Buscando no Emite Aí…");
       }
 
       if (total === 0) {
         toast.warning("Nenhuma nota encontrada no período");
       }
 
-      setLog((prev) => [
-        ...prev,
-        `✓ ${total} nota(s) encontrada(s) via ${source === "sieg" ? "SIEG" : "Emite Aí"}`,
-      ]);
+      endStep(
+        `${total} nota(s) encontrada(s) via ${source === "sieg" ? "SIEG" : "Emite Aí"}`,
+      );
 
+      addStep("Verificando devoluções…");
       const verificationResult = verifyNFe(docs, company.cnpj);
-
-      setLog((prev) => [
-        ...prev,
-        `✓ ${verificationResult.dev.length} devolução(ões) identificada(s)`,
-        ...verificationResult.log,
-        "✓ Verificação concluída",
-      ]);
+      const nDesc = verificationResult.desacordos.length;
+      endStep(
+        `${verificationResult.dev.length} devolução(ões) · ${nDesc} desacordo(s)`,
+        nDesc > 0 ? "warn" : "ok",
+      );
 
       setResult(verificationResult);
       toast.success(`${total} nota(s) verificada(s)`);
@@ -120,7 +124,7 @@ export default function DashboardPage() {
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erro desconhecido";
       setSource(null);
-      setLog((prev) => [...prev, `✗ ${message}`]);
+      endStep(message, "error");
       toast.error(message);
     } finally {
       setLoading(false);
@@ -161,7 +165,7 @@ export default function DashboardPage() {
             aria-label={
               loading ? "Verificando notas..." : "Verificar notas fiscais"
             }
-            className="w-full h-10 bg-amber-400 hover:bg-amber-300 text-zinc-950 font-semibold transition-colors duration-200 disabled:opacity-60 gap-2"
+            className="w-full h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-colors duration-200 disabled:opacity-60 gap-2"
           >
             {loading ? (
               <>
@@ -176,7 +180,7 @@ export default function DashboardPage() {
             )}
           </Button>
 
-          <EventLog log={log} onClear={() => setLog([])} />
+          <VerifySteps steps={steps} />
         </div>
 
         {/* Right column */}
@@ -187,6 +191,8 @@ export default function DashboardPage() {
             desc={result ? result.cnpjDesc.length : 0}
             loading={loading}
           />
+
+          {result && <DesacordosTable rows={result.desacordos} />}
 
           <DownloadPanel
             result={result}

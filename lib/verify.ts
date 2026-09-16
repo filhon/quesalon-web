@@ -1,11 +1,11 @@
-import type { NFeDoc, VerificationResult } from "./types";
+import type { Desacordo, NFeDoc, VerificationResult } from "./types";
 
 export function verifyNFe(docs: NFeDoc[], cnpj: string): VerificationResult {
   const dev: NFeDoc[] = [];
   const notDev: NFeDoc[] = [];
   const cnpjAcor: NFeDoc[] = [];
   const cnpjDesc: NFeDoc[] = [];
-  const log: string[] = [];
+  const desacordos: Desacordo[] = [];
 
   for (const doc of docs) {
     const finNFe = doc.nfeProc?.NFe?.infNFe?.ide?.finNFe;
@@ -19,6 +19,7 @@ export function verifyNFe(docs: NFeDoc[], cnpj: string): VerificationResult {
   for (const doc of dev) {
     const chNFe = String(doc.nfeProc?.protNFe?.infProt?.chNFe ?? "");
     const cnpjDev = chNFe.length >= 20 ? chNFe.substring(6, 20) : chNFe;
+    const nNF = String(doc.nfeProc?.NFe?.infNFe?.ide?.nNF ?? "");
     try {
       const nfRef = doc.nfeProc.NFe.infNFe.ide.NFref;
       // NFref pode ser objeto único ou array quando há múltiplas referências
@@ -29,20 +30,34 @@ export function verifyNFe(docs: NFeDoc[], cnpj: string): VerificationResult {
         const cnpjRef = refNFe.substring(6, 20);
         if (cnpjRef === cnpj) {
           cnpjAcor.push(doc);
-          log.push(`✓ acordo: ${cnpjDev}`);
         } else {
           cnpjDesc.push(doc);
-          log.push(`✗ desacordo: ${cnpjDev} (ref: ${cnpjRef} ≠ ${cnpj})`);
+          desacordos.push({
+            nNF,
+            cnpjDev,
+            cnpjRef,
+            motivo: "CNPJ referenciado difere",
+          });
         }
       } else {
         cnpjDesc.push(doc);
-        log.push(`✗ desacordo: ${cnpjDev} (sem nota referenciada)`);
+        desacordos.push({
+          nNF,
+          cnpjDev,
+          cnpjRef: null,
+          motivo: "Sem nota referenciada",
+        });
       }
     } catch {
       cnpjDesc.push(doc);
-      log.push(`⚠ atenção: ${cnpjDev}`);
+      desacordos.push({
+        nNF,
+        cnpjDev,
+        cnpjRef: null,
+        motivo: "Referência ilegível",
+      });
     }
   }
 
-  return { dev, notDev, cnpjAcor, cnpjDesc, log };
+  return { dev, notDev, cnpjAcor, cnpjDesc, desacordos };
 }

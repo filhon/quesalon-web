@@ -42,7 +42,7 @@ export function CNPJSelector({ value, onSelect, disabled }: Props) {
       >
         <SelectTrigger
           id="cnpj-select"
-          className="w-full h-9 bg-muted/60 border-border text-foreground focus:border-amber-400/50 focus:ring-amber-400/20"
+          className="w-full h-9 bg-muted/60 border-border text-foreground focus:border-primary/50 focus:ring-primary/20"
         >
           <SelectValue />
         </SelectTrigger>

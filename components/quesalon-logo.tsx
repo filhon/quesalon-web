@@ -1,25 +1,17 @@
-import type { SVGProps } from "react";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 
-export function QuesalonLogo({ className, ...props }: SVGProps<SVGSVGElement>) {
+// Wordmark cropped from the official logo (public/logo-quesalon.png).
+// Single flat indigo on transparent bg, so dark mode just turns it white.
+export function QuesalonLogo({ className }: { className?: string }) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 100 100"
-      fill="none"
-      className={className}
-      aria-hidden="true"
-      {...props}
-    >
-      <circle cx="50" cy="48" r="30" stroke="currentColor" strokeWidth="11" />
-      <line
-        x1="66"
-        y1="64"
-        x2="82"
-        y2="80"
-        stroke="currentColor"
-        strokeWidth="11"
-        strokeLinecap="round"
-      />
-    </svg>
+    <Image
+      src="/logo-quesalon.png"
+      alt="Quesalon"
+      width={916}
+      height={198}
+      priority
+      className={cn("w-auto dark:brightness-0 dark:invert", className)}
+    />
   );
 }

@@ -11,6 +11,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { ref, onValue } from "firebase/database";
 import { signOut } from "@/lib/auth-actions";
 import { auth, db } from "@/lib/firebase";
+import { formatCnpj } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SourceControl } from "@/components/dashboard/SourceControl";
@@ -25,10 +26,6 @@ const syne = Syne({
   variable: "--font-syne",
   display: "swap",
 });
-
-function formatCnpj(raw: string): string {
-  return raw.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
-}
 
 function AppHeader() {
   const { company } = useCompany();
@@ -67,12 +64,12 @@ function AppHeader() {
         {/* Logo + Nav */}
         <div className="flex items-center gap-3 sm:gap-5">
           <div className="flex items-center gap-2.5">
-            <QuesalonLogo className="size-7 text-amber-400" />
+            <QuesalonLogo className="h-6" />
             <span
-              className="hidden sm:inline text-sm font-semibold tracking-tight text-foreground"
+              className="hidden sm:inline text-sm font-semibold tracking-tight text-primary"
               style={{ fontFamily: "var(--font-syne)" }}
             >
-              Quesalon <span className="text-amber-400">RPA</span>
+              RPA
             </span>
           </div>
 
@@ -110,7 +107,7 @@ function AppHeader() {
             className="hidden sm:flex border-border bg-card text-foreground font-mono text-xs gap-2 px-3 py-1"
           >
             <span className="text-muted-foreground">{company.label}</span>
-            <span className="text-amber-400/70">
+            <span className="text-primary/80">
               {formatCnpj(company.cnpj)}
             </span>
           </Badge>

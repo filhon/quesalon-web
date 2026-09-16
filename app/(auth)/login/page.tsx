@@ -75,15 +75,13 @@ export default function LoginPage() {
         <CardHeader className="pb-2 pt-8 px-8">
           {/* Logo mark */}
           <div className="flex flex-col items-center gap-4 mb-2">
-            <div className="relative">
-              <QuesalonLogo className="size-14 text-amber-400" />
-            </div>
+            <QuesalonLogo className="h-12" />
             <div className="text-center">
               <h1
-                className="text-foreground text-xl font-semibold tracking-tight"
+                className="text-primary text-xl font-semibold tracking-tight"
                 style={{ fontFamily: "var(--font-syne)" }}
               >
-                Quesalon RPA
+                RPA
               </h1>
               <p className="text-muted-foreground text-xs mt-0.5 tracking-wide uppercase">
                 Sistema de Verificação Fiscal
@@ -113,7 +111,7 @@ export default function LoginPage() {
                 required
                 autoComplete="email"
                 disabled={loading}
-                className="bg-muted/60 border-border text-foreground placeholder:text-muted-foreground focus-visible:border-amber-400/50 focus-visible:ring-amber-400/20 h-10"
+                className="bg-muted/60 border-border text-foreground placeholder:text-muted-foreground focus-visible:border-primary/50 focus-visible:ring-primary/20 h-10"
               />
             </div>
 
@@ -133,7 +131,7 @@ export default function LoginPage() {
                 required
                 autoComplete="current-password"
                 disabled={loading}
-                className="bg-muted/60 border-border text-foreground placeholder:text-muted-foreground focus-visible:border-amber-400/50 focus-visible:ring-amber-400/20 h-10"
+                className="bg-muted/60 border-border text-foreground placeholder:text-muted-foreground focus-visible:border-primary/50 focus-visible:ring-primary/20 h-10"
               />
             </div>
 
@@ -146,7 +144,7 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-10 bg-amber-400 hover:bg-amber-300 text-zinc-950 font-semibold transition-colors duration-200 disabled:opacity-60 mt-1"
+              className="w-full h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-colors duration-200 disabled:opacity-60 mt-1"
             >
               {loading ? (
                 <>

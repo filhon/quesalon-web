@@ -104,7 +104,7 @@ export function SourceControl() {
         <Button
           size="sm"
           onClick={dismissOnboarding}
-          className="self-end bg-amber-400 hover:bg-amber-300 text-zinc-950"
+          className="self-end bg-primary hover:bg-primary/90 text-primary-foreground"
         >
           Entendi
         </Button>

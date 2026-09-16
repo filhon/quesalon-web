@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { auth, db } from "@/lib/firebase";
 import { getVerificationHistory, getReportHistory } from "@/lib/history";
 import { fetchAndDownload } from "@/lib/download-utils";
+import { formatCnpj } from "@/lib/utils";
 import type {
   NFeDoc,
   VerificationHistoryEntry,
@@ -27,10 +28,6 @@ function formatTs(ts: number): string {
 
 function formatDate(iso: string): string {
   return iso.split("-").reverse().join("/");
-}
-
-function formatCnpj(raw: string): string {
-  return raw.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
 }
 
 function usePagination<T>(items: T[]) {
@@ -195,7 +192,7 @@ function VerificationsTable({
                       Nenhuma verificação registrada.{" "}
                       <Link
                         href="/dashboard"
-                        className="text-foreground underline underline-offset-2 hover:text-amber-400 transition-colors"
+                        className="text-foreground underline underline-offset-2 hover:text-primary transition-colors"
                       >
                         Execute uma no Dashboard.
                       </Link>
@@ -343,7 +340,7 @@ function ReportsTable({
                       Nenhum relatório gerado ainda.{" "}
                       <Link
                         href="/dashboard"
-                        className="text-foreground underline underline-offset-2 hover:text-amber-400 transition-colors"
+                        className="text-foreground underline underline-offset-2 hover:text-primary transition-colors"
                       >
                         Gere um no Dashboard.
                       </Link>

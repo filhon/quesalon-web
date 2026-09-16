@@ -35,12 +35,20 @@ export interface NFeDoc {
   };
 }
 
+export interface Desacordo {
+  nNF: string;
+  cnpjDev: string;
+  /** CNPJ emitente da nota referenciada; null quando não há referência legível */
+  cnpjRef: string | null;
+  motivo: string;
+}
+
 export interface VerificationResult {
   dev: NFeDoc[];
   notDev: NFeDoc[];
   cnpjAcor: NFeDoc[];
   cnpjDesc: NFeDoc[];
-  log: string[];
+  desacordos: Desacordo[];
 }
 
 export interface Company {
