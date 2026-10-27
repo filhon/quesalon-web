@@ -11,14 +11,9 @@ import { onAuthStateChanged } from "firebase/auth";
 import { ref, onValue } from "firebase/database";
 import { signOut } from "@/lib/auth-actions";
 import { auth, db } from "@/lib/firebase";
-import { formatCnpj } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SourceControl } from "@/components/dashboard/SourceControl";
-import {
-  CompanyProvider,
-  useCompany,
-} from "@/components/dashboard/company-context";
+import { CompanyProvider } from "@/components/dashboard/company-context";
 import type { ReactNode } from "react";
 
 const syne = Syne({
@@ -28,7 +23,6 @@ const syne = Syne({
 });
 
 function AppHeader() {
-  const { company } = useCompany();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [lastAccess, setLastAccess] = useState<string | null>(null);
   const { resolvedTheme, setTheme } = useTheme();
@@ -100,26 +94,13 @@ function AppHeader() {
           </nav>
         </div>
 
-        {/* Center: selected company + data source */}
-        <div className="flex items-center gap-2">
-          <Badge
-            variant="outline"
-            className="hidden sm:flex border-border bg-card text-foreground font-mono text-xs gap-2 px-3 py-1"
-          >
-            <span className="text-muted-foreground">{company.label}</span>
-            <span className="text-primary/80">
-              {formatCnpj(company.cnpj)}
-            </span>
-          </Badge>
-          <SourceControl />
-        </div>
-
         {/* User info + Logout */}
         <div className="flex items-center gap-3">
+          <SourceControl />
           {lastAccess && (
             <span className="hidden lg:flex items-center gap-1.5 text-xs text-muted-foreground">
               <Clock className="size-3 shrink-0" aria-hidden="true" />
-              Último: {lastAccess}
+              Último acesso: {lastAccess}
             </span>
           )}
           {userEmail && (
@@ -166,9 +147,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         className={`${syne.variable} min-h-screen bg-background text-foreground app-bg-gradient`}
       >
         <AppHeader />
-        <h1 className="sr-only">
-          Quesalon RPA — Sistema de Verificação Fiscal
-        </h1>
+        <h1 className="sr-only">Quesalon RPA: Sistema de Verificação Fiscal</h1>
         <main className="pt-18 px-4 pb-4 md:px-6 md:pb-6 min-h-screen">
           {children}
         </main>

@@ -66,6 +66,8 @@ export interface VerificationHistoryEntry {
   userEmail: string;
   company: { label: string; cnpj: string };
   dateRange: { from: string; to: string };
+  /** Ausente nos registros anteriores a 27/10/2026, que não guardavam a fonte. */
+  source?: NfeSource;
   counts: {
     total: number;
     dev: number;

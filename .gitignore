@@ -50,3 +50,4 @@ PROMPTS.md
 
 # Respostas cruas da sonda da API (contêm dados fiscais reais)
 scripts/.probe-out/
+/acervo-sieg/

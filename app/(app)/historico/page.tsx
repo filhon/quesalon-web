@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { get, ref } from "firebase/database";
 import Link from "next/link";
-import { Download, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { AlertTriangle, Download, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,13 +11,12 @@ import { auth, db } from "@/lib/firebase";
 import { getVerificationHistory, getReportHistory } from "@/lib/history";
 import { fetchAndDownload } from "@/lib/download-utils";
 import { formatCnpj } from "@/lib/utils";
+import { SIEG_CAPTURE_END } from "@/lib/constants";
 import type {
   NFeDoc,
   VerificationHistoryEntry,
   ReportHistoryEntry,
 } from "@/lib/types";
-
-const PAGE_SIZE = 10;
 
 function formatTs(ts: number): string {
   return new Date(ts).toLocaleString("pt-BR", {
@@ -26,26 +25,29 @@ function formatTs(ts: number): string {
   });
 }
 
-function formatDate(iso: string): string {
-  return iso.split("-").reverse().join("/");
+/** "19/10 a 27/10/2026"; o ano só se repete quando muda. */
+function formatPeriod({ from, to }: { from: string; to: string }): string {
+  const [fy, fm, fd] = from.split("-");
+  const [ty, tm, td] = to.split("-");
+  return `${fd}/${fm}${fy === ty ? "" : `/${fy}`} a ${td}/${tm}/${ty}`;
 }
 
-function usePagination<T>(items: T[]) {
-  const [page, setPage] = useState(0);
-  const total = items.length;
-  const pageCount = Math.ceil(total / PAGE_SIZE);
-  const start = page * PAGE_SIZE;
-  const slice = items.slice(start, start + PAGE_SIZE);
+/**
+ * Período que passa do fim da captação do SIEG e não foi respondido pelo Emite Aí:
+ * as notas posteriores a 07/10/2026 faltam. Registros antigos não guardavam a fonte e,
+ * nesse caso, quem respondia era o SIEG (que devolvia 0 notas em vez de erro).
+ */
+const incompleta = (e: VerificationHistoryEntry) =>
+  e.dateRange.to > SIEG_CAPTURE_END && e.source !== "emiteai";
 
-  function prev() {
-    setPage((p) => Math.max(0, p - 1));
-  }
-  function next() {
-    setPage((p) => Math.min(pageCount - 1, p + 1));
-  }
+const SOURCE_LABEL = { sieg: "SIEG", emiteai: "Emite Aí" } as const;
 
-  return { slice, page, pageCount, total, start, prev, next };
-}
+const countClass = (n: number, attention = false) =>
+  n === 0
+    ? "text-muted-foreground"
+    : attention
+      ? "text-amber-600 dark:text-amber-400 font-medium"
+      : "text-foreground font-medium";
 
 function TableSkeleton({ cols }: { cols: number }) {
   return (
@@ -82,59 +84,6 @@ function EmptyRow({
   );
 }
 
-function Pagination({
-  page,
-  pageCount,
-  total,
-  start,
-  onPrev,
-  onNext,
-}: {
-  page: number;
-  pageCount: number;
-  total: number;
-  start: number;
-  onPrev: () => void;
-  onNext: () => void;
-}) {
-  if (total <= PAGE_SIZE) return null;
-
-  const end = Math.min(start + PAGE_SIZE, total);
-
-  return (
-    <div className="flex items-center justify-between px-4 py-2.5 border-t border-border">
-      <span className="text-xs text-muted-foreground tabular-nums">
-        {start + 1}–{end} de {total}
-      </span>
-      <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onPrev}
-          disabled={page === 0}
-          className="h-7 px-2 text-muted-foreground hover:text-foreground disabled:opacity-30 gap-1"
-        >
-          <ChevronLeft className="size-3.5" />
-          <span className="text-xs">Anterior</span>
-        </Button>
-        <span className="text-xs text-muted-foreground tabular-nums px-1">
-          {page + 1}/{pageCount}
-        </span>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onNext}
-          disabled={page >= pageCount - 1}
-          className="h-7 px-2 text-muted-foreground hover:text-foreground disabled:opacity-30 gap-1"
-        >
-          <span className="text-xs">Próxima</span>
-          <ChevronRight className="size-3.5" />
-        </Button>
-      </div>
-    </div>
-  );
-}
-
 function VerificationsTable({
   entries,
   loading,
@@ -142,10 +91,8 @@ function VerificationsTable({
   entries: VerificationHistoryEntry[];
   loading: boolean;
 }) {
-  const { slice, page, pageCount, total, start, prev, next } =
-    usePagination(entries);
-
-  const cols = 7;
+  const total = entries.length;
+  const cols = 8;
 
   return (
     <section>
@@ -168,9 +115,10 @@ function VerificationsTable({
                   { label: "Usuário", cls: "hidden md:table-cell" },
                   { label: "Empresa", cls: "" },
                   { label: "Período", cls: "" },
-                  { label: "Total", cls: "hidden md:table-cell" },
-                  { label: "Dev.", cls: "" },
-                  { label: "Desc.", cls: "" },
+                  { label: "Fonte", cls: "" },
+                  { label: "Notas", cls: "hidden md:table-cell" },
+                  { label: "Devoluções", cls: "" },
+                  { label: "Desacordos", cls: "" },
                 ].map(({ label, cls }) => (
                   <th
                     key={label}
@@ -184,7 +132,7 @@ function VerificationsTable({
             <tbody className="divide-y divide-border">
               {loading ? (
                 <TableSkeleton cols={cols} />
-              ) : slice.length === 0 ? (
+              ) : total === 0 ? (
                 <EmptyRow
                   cols={cols}
                   message={
@@ -200,7 +148,7 @@ function VerificationsTable({
                   }
                 />
               ) : (
-                slice.map((e) => (
+                entries.map((e) => (
                   <tr
                     key={e.id}
                     className="hover:bg-muted/20 transition-colors duration-100"
@@ -224,21 +172,41 @@ function VerificationsTable({
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground tabular-nums">
+                    <td className="px-4 py-3 text-xs text-muted-foreground tabular-nums whitespace-nowrap">
+                      {formatPeriod(e.dateRange)}
+                    </td>
+                    <td className="px-4 py-3 text-xs whitespace-nowrap">
                       <div className="flex flex-col gap-0.5">
-                        <span>{formatDate(e.dateRange.from)}</span>
-                        <span className="text-muted-foreground/60">
-                          {formatDate(e.dateRange.to)}
+                        <span className="text-foreground">
+                          {e.source ? SOURCE_LABEL[e.source] : "Não registrada"}
                         </span>
+                        {incompleta(e) && (
+                          <span
+                            className="flex items-center gap-1 text-amber-700 dark:text-amber-400"
+                            title="O SIEG só tem notas até 07/10/2026: as notas posteriores não entraram nesta verificação."
+                          >
+                            <AlertTriangle
+                              className="size-3 shrink-0"
+                              aria-hidden="true"
+                            />
+                            Incompleta após 07/10
+                          </span>
+                        )}
                       </div>
                     </td>
-                    <td className="hidden md:table-cell px-4 py-3 text-xs text-foreground tabular-nums font-medium">
+                    <td
+                      className={`hidden md:table-cell px-4 py-3 text-xs tabular-nums ${countClass(e.counts.total)}`}
+                    >
                       {e.counts.total.toLocaleString("pt-BR")}
                     </td>
-                    <td className="px-4 py-3 text-xs text-blue-500 dark:text-blue-400 tabular-nums font-medium">
+                    <td
+                      className={`px-4 py-3 text-xs tabular-nums ${countClass(e.counts.dev)}`}
+                    >
                       {e.counts.dev.toLocaleString("pt-BR")}
                     </td>
-                    <td className="px-4 py-3 text-xs text-amber-500 dark:text-amber-400 tabular-nums font-medium">
+                    <td
+                      className={`px-4 py-3 text-xs tabular-nums ${countClass(e.counts.cnpjDesc, true)}`}
+                    >
                       {e.counts.cnpjDesc.toLocaleString("pt-BR")}
                     </td>
                   </tr>
@@ -247,14 +215,6 @@ function VerificationsTable({
             </tbody>
           </table>
         </div>
-        <Pagination
-          page={page}
-          pageCount={pageCount}
-          total={total}
-          start={start}
-          onPrev={prev}
-          onNext={next}
-        />
       </div>
     </section>
   );
@@ -268,8 +228,7 @@ function ReportsTable({
   loading: boolean;
 }) {
   const [busy, setBusy] = useState<string | null>(null);
-  const { slice, page, pageCount, total, start, prev, next } =
-    usePagination(entries);
+  const total = entries.length;
 
   const cols = 6;
 
@@ -332,7 +291,7 @@ function ReportsTable({
             <tbody className="divide-y divide-border">
               {loading ? (
                 <TableSkeleton cols={cols} />
-              ) : slice.length === 0 ? (
+              ) : total === 0 ? (
                 <EmptyRow
                   cols={cols}
                   message={
@@ -348,7 +307,7 @@ function ReportsTable({
                   }
                 />
               ) : (
-                slice.map((e) => (
+                entries.map((e) => (
                   <tr
                     key={e.id}
                     className="hover:bg-muted/20 transition-colors duration-100"
@@ -372,15 +331,12 @@ function ReportsTable({
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground tabular-nums">
-                      <div className="flex flex-col gap-0.5">
-                        <span>{formatDate(e.dateRange.from)}</span>
-                        <span className="text-muted-foreground/60">
-                          {formatDate(e.dateRange.to)}
-                        </span>
-                      </div>
+                    <td className="px-4 py-3 text-xs text-muted-foreground tabular-nums whitespace-nowrap">
+                      {formatPeriod(e.dateRange)}
                     </td>
-                    <td className="px-4 py-3 text-xs text-blue-500 dark:text-blue-400 tabular-nums font-medium">
+                    <td
+                      className={`px-4 py-3 text-xs tabular-nums ${countClass(e.devCount)}`}
+                    >
                       {e.devCount.toLocaleString("pt-BR")}
                     </td>
                     <td className="px-4 py-3">
@@ -397,7 +353,7 @@ function ReportsTable({
                           )
                         }
                         className="h-7 px-2.5 text-xs gap-1.5 bg-muted/40 border-border text-foreground hover:bg-muted/60 disabled:opacity-40"
-                        aria-label="Baixar relatório Excel"
+                        aria-label={`Baixar relatório de devoluções de ${e.company.label}, ${formatPeriod(e.dateRange)}`}
                       >
                         {busy === e.id ? (
                           <Loader2 className="size-3 animate-spin" />
@@ -413,14 +369,6 @@ function ReportsTable({
             </tbody>
           </table>
         </div>
-        <Pagination
-          page={page}
-          pageCount={pageCount}
-          total={total}
-          start={start}
-          onPrev={prev}
-          onNext={next}
-        />
       </div>
     </section>
   );

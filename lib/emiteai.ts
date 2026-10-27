@@ -3,7 +3,10 @@ import type { NFeDoc } from "./types";
 
 const HOST = process.env.EMITEAI_HOST ?? "api.emiteai.com.br";
 const SLICE_DAYS = 28; // a API recusa janelas maiores que 1 mês calendário
-const RECEIPT_LAG_DAYS = 7; // observado: a nota entra até ~1,5 dia após a emissão
+// mediana de 0,5 dia, mas recapturas em lote trazem notas até 75 dias depois da emissão
+// (13 de 79 da Quedes em jul–set/2026 chegaram com mais de 7 dias)
+const RECEIPT_LAG_DAYS = 90;
+const STATUS_CHUNK = 100; // chaves por chamada ao /nfe, para a URL ficar em ~5 KB
 const TIMEOUT_MS = 45_000; // cada consulta leva ~15s, mesmo sem resultados
 
 type InfNFe = NFeDoc["nfeProc"]["NFe"]["infNFe"];
@@ -61,6 +64,37 @@ function getDocumentosRecebidos(
     req.on("error", reject);
     req.end(body);
   });
+}
+
+/** Status na SEFAZ de cada chave (AUTORIZADA, CANCELADA, DENEGADA ou NAO_RECEBIDA), em lote. */
+export async function fetchStatusNFe(
+  chaves: string[],
+): Promise<Map<string, string>> {
+  const token = process.env.EMITEAI_TOKEN;
+  if (!token) throw new Error("EMITEAI_TOKEN not configured");
+
+  const lotes: string[][] = [];
+  for (let i = 0; i < chaves.length; i += STATUS_CHUNK)
+    lotes.push(chaves.slice(i, i + STATUS_CHUNK));
+
+  const pages = await Promise.all(
+    lotes.map(async (lote) => {
+      const res = await fetch(
+        `https://${HOST}/nfe?chaveAcessoList=${lote.join(",")}`,
+        {
+          headers: { "x-token": token },
+          signal: AbortSignal.timeout(TIMEOUT_MS),
+        },
+      );
+      if (!res.ok)
+        throw new Error(`emiteaí API error ${res.status}: ${await res.text()}`);
+      return (await res.json()) as Array<{
+        chaveAcesso: string;
+        status: string;
+      }>;
+    }),
+  );
+  return new Map(pages.flat().map((s) => [s.chaveAcesso, s.status]));
 }
 
 /** Fatias contíguas de até SLICE_DAYS dias cobrindo startDate..endDate (YYYY-MM-DD). */

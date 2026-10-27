@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { format, startOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
@@ -28,9 +28,17 @@ function formatDate(d: Date): string {
   return format(d, "dd 'de' MMM yyyy", { locale: ptBR });
 }
 
+const noopSubscribe = () => () => {};
+
 export function DateRangePicker({ value, onChange, disabled }: Props) {
   const [fromOpen, setFromOpen] = useState(false);
   const [toOpen, setToOpen] = useState(false);
+  // a página é pré-renderizada no build: a data do HTML é a do build, não a de hoje (React #418)
+  const hydrated = useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
 
   return (
     <div className="flex flex-col gap-3">
@@ -51,7 +59,7 @@ export function DateRangePicker({ value, onChange, disabled }: Props) {
               className="w-full h-9 justify-start gap-2 bg-muted/60 border-border text-foreground hover:bg-muted/80 hover:text-foreground font-normal text-sm"
             >
               <CalendarIcon className="size-3.5 text-muted-foreground shrink-0" />
-              <span>{formatDate(value.from)}</span>
+              <span>{hydrated && formatDate(value.from)}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent
@@ -92,7 +100,7 @@ export function DateRangePicker({ value, onChange, disabled }: Props) {
               className="w-full h-9 justify-start gap-2 bg-muted/60 border-border text-foreground hover:bg-muted/80 hover:text-foreground font-normal text-sm"
             >
               <CalendarIcon className="size-3.5 text-muted-foreground shrink-0" />
-              <span>{formatDate(value.to)}</span>
+              <span>{hydrated && formatDate(value.to)}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent
@@ -108,7 +116,7 @@ export function DateRangePicker({ value, onChange, disabled }: Props) {
                   setToOpen(false);
                 }
               }}
-              disabled={{ before: value.from }}
+              disabled={[{ before: value.from }, { after: new Date() }]}
               defaultMonth={value.to}
               locale={ptBR}
             />

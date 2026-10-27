@@ -9,7 +9,8 @@ for (const l of readFileSync(".env.local", "utf-8").split("\n")) {
     process.env[l.slice(0, i).trim()] ??= l.slice(i + 1).trim();
 }
 
-const { sliceRange, fetchNFeRecebidas } = await import("../lib/emiteai.ts");
+const { sliceRange, fetchNFeRecebidas, fetchStatusNFe } =
+  await import("../lib/emiteai.ts");
 const { verifyNFe } = await import("../lib/verify.ts");
 
 // --- sliceRange: fatias ≤ 28 dias, contíguas, cobrindo o período ---
@@ -24,6 +25,14 @@ assert.deepEqual(sliceRange("2026-09-01", "2026-09-01"), [
 ]);
 assert.deepEqual(sliceRange("2026-09-02", "2026-09-01"), []);
 console.log("sliceRange ok");
+
+// --- status em lote: uma nota da Quedes e uma chave que a emiteaí não conhece ---
+const AUT = "26260908939548000103550010000829631640477451";
+const DESC = "35260536044911000168570010000713501865379550";
+const st = await fetchStatusNFe([AUT, DESC]);
+assert.equal(st.get(AUT), "AUTORIZADA");
+assert.equal(st.get(DESC), "NAO_RECEBIDA");
+console.log("fetchStatusNFe ok");
 
 // --- fetch real: Quedes, desde o início da retenção ---
 const QUEDES = "13002532000100";

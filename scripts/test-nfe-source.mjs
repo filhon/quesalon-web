@@ -28,7 +28,7 @@ assert.equal(r.source, "emiteai");
 assert.equal(r.fallbackReason, undefined);
 delete process.env.NEXT_PUBLIC_NFE_SOURCE;
 
-// 1b. escolha manual do usuário: Emite Aí direto, sem passar pelo SIEG
+// 1b. preferred "emiteai": Emite Aí direto, sem passar pelo SIEG
 r = await run("manual emiteai", "emiteai");
 assert.equal(r.source, "emiteai");
 assert.equal(r.fallbackReason, undefined);
@@ -36,6 +36,18 @@ assert.equal(r.fallbackReason, undefined);
 // 2. SIEG saudável tem preferência
 r = await run("sieg ok");
 assert.equal(r.source, "sieg");
+
+// 2b. período depois do fim da captação do SIEG: nem tenta o SIEG (que daria 0 notas falso)
+r = await fetchNFe(QUEDES, "2026-10-08", "2026-10-09").catch((e) => e);
+if (r instanceof Error) {
+  // a emiteaí pode estar fora; o que importa é a mensagem do corte e não ter chamado o SIEG
+  assert.match(r.message, /só existem nele/);
+  assert.doesNotMatch(r.cause, /SIEG:/);
+} else {
+  assert.equal(r.source, "emiteai");
+  assert.equal(r.fallbackReason, undefined);
+}
+console.log("pós-captação SIEG ok");
 
 // 3. SIEG quebrado: cai para o Emite Aí com motivo, 3x seguidas...
 process.env.SIEG_API_KEY = "chave-invalida";

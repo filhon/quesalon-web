@@ -10,7 +10,9 @@ export function DesacordosTable({ rows }: { rows: Desacordo[] }) {
         <span className="text-muted-foreground text-xs uppercase tracking-wider">
           Desacordos
         </span>
-        <span className="text-xs tabular-nums text-amber-500 dark:text-amber-400 font-medium">
+        <span
+          className={`text-xs tabular-nums font-medium ${rows.length ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground"}`}
+        >
           {rows.length}
         </span>
       </div>

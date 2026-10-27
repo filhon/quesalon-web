@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { cnpj, startDate, endDate, preferred } = await request.json();
+    const { cnpj, startDate, endDate } = await request.json();
 
     if (!cnpj || !ALLOWED_CNPJS.has(cnpj)) {
       return Response.json({ error: "Invalid CNPJ" }, { status: 400 });
@@ -39,15 +39,25 @@ export async function POST(request: Request) {
       );
     }
 
-    const { docs, source, fallbackReason } = await fetchNFe(
+    const { docs, source, fallbackReason, canceladas } = await fetchNFe(
       cnpj,
       startDate,
       endDate,
-      preferred === "emiteai" ? "emiteai" : "sieg",
     );
-    return Response.json({ docs, total: docs.length, source, fallbackReason });
+    return Response.json({
+      docs,
+      total: docs.length,
+      source,
+      fallbackReason,
+      canceladas,
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    return Response.json({ error: message }, { status: 500 });
+    // `cause` carrega o erro técnico das APIs; a mensagem já é para o operador
+    const detail =
+      err instanceof Error && typeof err.cause === "string"
+        ? err.cause
+        : undefined;
+    return Response.json({ error: message, detail }, { status: 500 });
   }
 }
